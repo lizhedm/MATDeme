@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Recommendation Evaluation</title>
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <form>
+        <div class="wrap">
+            <label class="tip">Accuracy:</label>
+        </div>
+        <div class="wrap">
+            <label class="tip">Confidence:</label><br>
+        </div>
+    </form>
+    <form>
+            <div>
+               <a href="{{ url_for('recommendation_explanation') }}">Go back</a>
+               <a href="{{ url_for('movie_degree') }}">Next</a>
+           </div>
+        </form>
+</body>
+
+</html>

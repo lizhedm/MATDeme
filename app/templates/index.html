@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Start</title>
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+        <h1> Hello , {{ user.username }} !</h1>
+        <div>
+           <a href="{{ url_for('index') }}">Home</a>
+           <a href="{{ url_for('explanation') }}">Start</a>
+       </div>
+{#        <button id = "start">Start</button>#}
+{#        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>#}
+{#        <script>#}
+{#            $('#start').click(function () {#}
+{#                alert('Start button clicked !');#}
+{#                window.location.href = 'http://127.0.0.1:5000' + {{url_for('explanation')}};#}
+{#            });#}
+{#        </script>#}
+
+</body>
+</html>

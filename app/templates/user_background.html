@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - User Background</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+        <form>
+          <div class="wrap">
+          <label class="tip">How often will you watch a movie</label>
+          <input type="radio" name="frequency" />several days
+          <input type="radio" name="frequency" />once a week
+          <input type="radio" name="frequency" />once a month
+         </div>
+
+          <div class="wrap">
+          <label class="tip">How often will you visit a movie recommendation website</label>
+          <input type="radio" name="frequency" />several days
+          <input type="radio" name="frequency" />once a week
+          <input type="radio" name="frequency" />once a month
+         </div>
+
+           <div class="wrap">
+          <label class="tip">How often will you ...</label>
+          <input type="radio" name="frequency" />several days
+          <input type="radio" name="frequency" />once a week
+          <input type="radio" name="frequency" />once a month
+         </div>
+         </form>
+
+        <form>
+            <div>
+               <a href="{{ url_for('user_information') }}">Go back</a>
+               <a href="{{ url_for('movie_preview') }}" >Next</a>
+           </div>
+        </form>
+
+</body>
+</html>

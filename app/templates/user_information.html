@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - User Information</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{#    <link rel="stylesheet" type="text/css" href="user_information.css">#}
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+        <form>
+          <div class="wrap">
+          <label class="tip">Your name: </label>
+          <input value="Zhe Li"/>
+          </div>
+
+          <div class="wrap">
+          <label class="tip">Gender:</label>
+          <input value="Male"/>
+          </div>
+         </form>
+
+        <form>
+          <div class="wrap">
+          <label class="tip">Age</label>
+          <input type="radio" name="age" />0~18
+          <input type="radio" name="age" />18~24
+          <input type="radio" name="age" />25~34
+          <input type="radio" name="age" />35~44
+          <input type="radio" name="age" />45~49
+          <input type="radio" name="age" />50~55
+          <input type="radio" name="age">56+
+         </div>
+         </form>
+
+        <form>
+          <div class="wrap">
+          <label class="tip">Occupation</label>
+          <select id="occupation">
+              <option value="0">Other</option>
+              <option value="1">academic/educator</option>
+              <option value="2">artist</option>
+              <option value="3">clerical/admin</option>
+              <option value="4">college/grad student</option>
+              <option value="5">customer service</option>
+              <option value="6">doctor/health care</option>
+              <option value="7">executive/managerial</option>
+              <option value="8">farmer</option>
+              <option value="9">homemaker</option>
+              <option value="10">K-12 student</option>
+              <option value="11">lawyer</option>
+              <option value="12">programmer</option>
+              <option value="13">retired</option>
+              <option value="14">sales/marketing</option>
+              <option value="15">scientist</option>
+              <option value="16">self-employed</option>
+              <option value="17">technician/engineer</option>
+              <option value="18">tradesman/craftsman</option>
+              <option value="19">unemployed</option>
+              <option value="20">writer</option>
+          </select>
+         </div>
+         </form>
+
+        <script type="text/javascript">
+            $("#occupation").change(function () {
+                alert(this.value);
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.occupation_value = this.value;
+
+                } else {
+                    alert("Not support web storage");
+                }
+                alert(sessionStorage.occupation_value);
+            });
+        </script>
+
+        <form>
+            <div>
+               <a href="{{ url_for('explanation') }}">Go back</a>
+               <a href="{{ url_for('user_background') }}" >Next</a>
+           </div>
+        </form>
+
+
+</body>
+</html>

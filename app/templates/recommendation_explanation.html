@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Recommendation Explanation</title>
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <form>
+        <div class="wrap">
+            <label class="tip">We recommend "Sun also rises" to you, because:</label>
+        </div>
+        <div class="wrap">
+            <label class="tip">1, You choosed Y before and Y has similar tags as comedy with "Sun also rises".</label><br>
+        </div>
+        <div class="wrap">
+            <label class="tip">2, Most users who chosed Y will also like "Sun also rises".</label><br>
+        </div>
+        <div class="wrap">
+            <label class="tip">3,......</label>
+        </div>
+    </form>
+    <form>
+            <div>
+               <a href="{{ url_for('movie_degree') }}">Go back</a>
+               <a href="{{ url_for('recommendation_evaluation') }}" >Next</a>
+           </div>
+        </form>
+</body>
+</html>

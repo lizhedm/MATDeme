@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - Movie Degree</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/raty/2.8.0/jquery.raty.min.js"></script>
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bar-rating/1.2.2/jquery.barrating.min.js"></script>#}
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: #eee;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: right;
+        }
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        .image{
+            width: auto;
+            height: auto;
+            border: 1px solid gray;
+            float: left;
+            margin: 5px;
+            text-align: center;
+        }
+        img{
+            width: 200px;
+            height: 200px;
+            margin: 5px;
+        }
+        .text{
+            font: 12px caption;
+            margin-bottom: 5px;
+        }
+        .container{
+            margin: 50px auto;
+            width: 700px;
+        }
+        a:hover > img{
+            transform: scale(1.5,1.5);
+            -webkit-transition: .3s transform;
+            -moz-transition: .3s transform;
+            transition: .3s transform;
+        }
+
+    </style>
+</head>
+<body>
+    <form>
+        <div class="wrap">
+            <label class="tip">The degree of preference from you for the movie "Sun also rises"</label>
+        </div>
+    </form>
+    <div class="image">
+        <a href="#"><img src="https://m.media-amazon.com/images/M/MV5BMzM1MjU2YTUtNmU0MS00YTEyLWI1NmUtNGQ3NjY1NWU1MTQwXkEyXkFqcGdeQXVyMjg0MTI5NzQ@._V1_.jpg"></a>
+        <div class="text">Sun Also Rises</div>
+    </div>
+{#    <div>#}
+{#        <select id="example">#}
+{#          <option value="1" data-html="0">1</option>#}
+{#          <option value="2" data-html="25">2</option>#}
+{#          <option value="3" data-html="50">3</option>#}
+{#          <option value="4" data-html="75">4</option>#}
+{#          <option value="5" data-html="100">5</option>#}
+{#        </select>#}
+{#    </div>#}
+    <div id="star"></div>
+    <script type="text/javascript">
+        $('#star').raty();
+    </script>
+
+    <form>
+        <div>
+            <a href="{{ url_for('movie_preview') }}">Go back</a>
+            <a href="{{ url_for('recommendation_explanation') }}" >Next</a>
+        </div>
+    </form>
+
+</body>
+</html>

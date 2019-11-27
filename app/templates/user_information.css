@@ -1,0 +1,29 @@
+/*This css file cannot be linked to the html file*/
+
+body, html {
+    margin:0;
+    padding: 0;
+}
+
+body {
+    font: 12pt Arial, sans-serif;
+    position: relative;
+    background-color: #eee;
+}
+
+form{
+    margin:0 auto;
+    font-weight:bold;
+}
+
+.wrap{
+    padding:5px 0;
+    margin:10px 0;
+}
+
+.tip{
+    width:40%;
+    padding-right:20px;
+    float:left;
+    text-align: right;
+}
