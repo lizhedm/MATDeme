@@ -20,8 +20,8 @@ class PGATRecSys(object):
                 self.data.num_nodes[0],
                 self.data.num_relations[0],
                 **model_args)
-        if not dataset_args['debug']:
-            model.load_state_dict(torch.load(train_args))
+        # if not dataset_args['debug']:
+        #     model.load_state_dict(torch.load(train_args))
         self.model = model.to(train_args['device'])
 
     def get_top_n_popular_items(self, n=10):
@@ -50,9 +50,10 @@ class PGATRecSys(object):
         :return:
         """
         # Build edges for new user
+
         new_user_nid = self.model.node_emb.weight.shape[0]
-        new_user_gender_nid = self.data.gender2nid_map[demographic_info['gender']]
-        new_user_occ_nid = self.data.gender2nid_map[demographic_info['occupation']]
+        new_user_gender_nid = self.data.gender_node_id_map[0][demographic_info[0]]
+        new_user_occ_nid = self.data.occupation_node_id_map[0][demographic_info[1]]
         row = [new_user_nid for i in range(len(iids) + 2)]
         col = iids + [new_user_gender_nid, new_user_occ_nid]
         new_edge_index_np = torch.from_numpy(np.array([row, col]))
@@ -63,14 +64,14 @@ class PGATRecSys(object):
         edge_index_np = self.data.edge_index.numpy()
         edge_index_df = pd.DataFrame({'middle': edge_index_np[0, :], 'tail': edge_index_np[1, :]})
         new_sec_order_edge_df = pd.merge(new_edge_index_df, edge_index_df, on='middle')
-        new_sec_order_edge_np = new_sec_order_edge_df.to_numpy().t()
-        new_sec_order_edge = torch.from_numpy(new_sec_order_edge_np)
+        new_sec_order_edge_np = new_sec_order_edge_df.to_numpy()
+        new_sec_order_edge = torch.from_numpy(new_sec_order_edge_np).to(self.train_args['device']).t()
 
         # Get new user embedding by applying message passing
         node_emb = self.model.node_emb.weight
-        new_user_emb = torch.tensor((1, self.model.node_emb.weight.shape[1]))
+        new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1]).weight
         node_emb = torch.cat((node_emb, new_user_emb), dim=0)
-        self.new_user_emb = self.model(node_emb, new_edge_index, new_sec_order_edge)[-1, :]
+        self.new_user_emb = self.model.forward_(node_emb, new_edge_index, new_sec_order_edge)[-1, :]
         print('user building done...')
 
     def get_recommendations(self):

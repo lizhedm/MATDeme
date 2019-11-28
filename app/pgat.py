@@ -33,18 +33,18 @@ class PGATNetEx(ExKGNet):
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
 
-    def forward_(self, edge_index, sec_order_edge_index):
-        self.forward(self.node_emb.weight, edge_index, sec_order_edge_index)
+    def forward_(self, x, edge_index, sec_order_edge_index):
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, sec_order_edge_index)
+        return x
 
-    def forward(self, x, edge_index, sec_order_edge_index):
+    def forward(self, edge_index, sec_order_edge_index):
         '''
 
         :param edge_index: np.array, [2, N]
         :param sec_order_edge_index: [3, M]
         :return:
         '''
-        x = F.relu(self.conv1(self.node_emb.weight, edge_index))
-        x = F.dropout(x, training=self.training)
-        x = self.conv2(x, sec_order_edge_index)
-        return x
+        self.forward_(self.node_emb.weight, edge_index, sec_order_edge_index)
 

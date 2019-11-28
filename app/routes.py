@@ -19,8 +19,8 @@ parser.add_argument("--dataset", type=str, default='movielens', help="")
 parser.add_argument("--dataset_name", type=str, default='1m', help="")
 parser.add_argument("--num_core", type=int, default=10, help="")
 parser.add_argument("--sec_order", type=bool, default=False, help="")
-parser.add_argument("--train_ratio", type=float, default=0.8, help="")
-parser.add_argument("--debug", default=0.1, help="")
+parser.add_argument("--train_ratio", type=float, default=False, help="")
+parser.add_argument("--debug", default=False, help="")
 
 # Model params
 parser.add_argument("--heads", type=int, default=4, help="")
@@ -85,12 +85,12 @@ recsys = PGATRecSys(num_recs=200, train_args=train_args, model_args=model_args, 
 @app.template_global()
 def generateIDs(n):
     movie_df = recsys.get_top_n_popular_items(n)
-    raw_iids = [recsys.data.iid2raw_iid[0][iid] for iid in movie_df.iid]
-    return raw_iids
+    iids = [iid for iid in movie_df.iid]
+    return iids
 
 @app.template_global()
 def get_movie_name_withID(i):
-    movies = pd.read_csv('/Users/lizhe/Dropbox/HCI_Master/SS19/Thesis/MADemo/app/ml-1m/movies.dat', sep='::', engine='python')
+    movies = pd.read_csv('app/ml-1m/movies.dat', sep='::', engine='python')
     movie_name = movies['MovieName'][i]
     return movie_name
 
@@ -99,7 +99,7 @@ def get_movie_poster_withID(i):
 
     # apikey = 'e760129c'
     apikey = 'e44e5305'
-    movies = pd.read_csv('/Users/lizhe/Dropbox/HCI_Master/SS19/Thesis/MADemo/app/ml-1m/movies.dat', sep='::', engine='python')
+    movies = pd.read_csv('app/ml-1m/movies.dat', sep='::', engine='python')
     movie_name = get_movie_name_withID(i)
     movie_title = movie_name[0:-7]
     movie_year = movie_name[-5:-1]
@@ -141,24 +141,23 @@ def movie_preview():
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():
     if request.method == 'POST':
-        # if 'id' in request.POST:
-        # import pdb
-        # pdb.set_trace()
-        id = request.values['id']
+        id = int(request.values['id'])
         gender = request.values['gender']
         occupation = request.values['occupation']
-
-        demographic_info = (gender,occupation)
-        # return ('id = ' + id + 'occ = ' + occupation)
-        print('id = ' + id + ',gender = ' + gender + ',occu = ' + occupation)
+        demographic_info = (gender, occupation)
+        print('New user created! (id: {}, gender: {}, occ: {})'.format(id, gender, occupation))
         iid_list.append(id)
         if len(iid_list) == 10:
-            recsys.build_user(iid_list,demographic_info)
+            recsys.build_user(iid_list, demographic_info)
         return 'success'
     else:
         return 'fail'
 
-# recsys.build_user()
+@app.route()
+def us:
+    # TODO
+    iids = recsys.get_recommendations(n)
+
 
 @app.route('/movie_degree')
 def movie_degree():
