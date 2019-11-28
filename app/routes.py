@@ -1,7 +1,8 @@
-from flask import render_template
+from flask import render_template, request
 from app import app
 import pandas as pd
 import requests
+# from django.http import HttpResponse
 import json
 import random
 import argparse
@@ -45,6 +46,9 @@ parser.add_argument("--early_stopping", type=int, default=40, help="")
 
 args = parser.parse_args()
 
+# save id selected by users
+iid_list = []
+
 __model__ = 'PGAT'
 
 # Setup data and weights file path
@@ -76,9 +80,10 @@ print('dataset params: {}'.format(dataset_args))
 print('task params: {}'.format(model_args))
 print('train params: {}'.format(train_args))
 
+recsys = PGATRecSys(num_recs=200, train_args=train_args, model_args=model_args, dataset_args=dataset_args)
+
 @app.template_global()
 def generateIDs(n):
-    recsys = PGATRecSys(num_recs=n, train_args=train_args, model_args=model_args, dataset_args=dataset_args)
     movie_df = recsys.get_top_n_popular_items(n)
     raw_iids = [recsys.data.iid2raw_iid[0][iid] for iid in movie_df.iid]
     return raw_iids
@@ -133,6 +138,28 @@ def user_background():
 def movie_preview():
     return render_template('movie_preview.html',title = 'Film Recommendation')
 
+@app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
+def imgID_userinfo_transfer():
+    if request.method == 'POST':
+        # if 'id' in request.POST:
+        # import pdb
+        # pdb.set_trace()
+        id = request.values['id']
+        gender = request.values['gender']
+        occupation = request.values['occupation']
+
+        demographic_info = (gender,occupation)
+        # return ('id = ' + id + 'occ = ' + occupation)
+        print('id = ' + id + ',gender = ' + gender + ',occu = ' + occupation)
+        iid_list.append(id)
+        if len(iid_list) == 10:
+            recsys.build_user(iid_list,demographic_info)
+        return 'success'
+    else:
+        return 'fail'
+
+# recsys.build_user()
+
 @app.route('/movie_degree')
 def movie_degree():
     return render_template('movie_degree.html',title = 'Film Recommendation')
@@ -144,3 +171,13 @@ def recommendation_explanation():
 @app.route('/recommendation_evaluation')
 def recommendation_evaluation():
     return render_template('recommendation_evaluation.html',title = 'Film Recommendation')
+
+# testInfo = {}
+# @app.route('/imgID_userinfo_post',methods=['GET','POST'])
+# def imgID_userinfo_post():
+#     testInfo['id'] = '456'
+#     testInfo['occupation'] = '2'
+#     return json.dumps(testInfo)
+
+
+

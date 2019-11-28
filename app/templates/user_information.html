@@ -41,11 +41,16 @@
           <label class="tip">Your name: </label>
           <input value="Zhe Li"/>
           </div>
+         </form>
 
+        <form>
           <div class="wrap">
           <label class="tip">Gender:</label>
-          <input value="Male"/>
-          </div>
+          <select id="gender">
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+          </select>
+         </div>
          </form>
 
         <form>
@@ -92,7 +97,7 @@
 
         <script type="text/javascript">
             $("#occupation").change(function () {
-                alert(this.value);
+{#                alert(this.value);#}
                 if(typeof(Storage) !== "undefined") {
 
                     sessionStorage.occupation_value = this.value;
@@ -100,7 +105,18 @@
                 } else {
                     alert("Not support web storage");
                 }
-                alert(sessionStorage.occupation_value);
+{#                alert(sessionStorage.occupation_value);#}
+            });
+
+            $("#gender").change(function () {
+{#                alert(this.value);#}
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.gender_value = this.value;
+
+                } else {
+                    alert("Not support web storage");
+                }
             });
         </script>
 

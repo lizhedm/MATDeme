@@ -66,6 +66,9 @@
         }
 
     </style>
+    <script>
+        URL = '{{ url_for('imgID_userinfo_transfer') }}'
+    </script>
 </head>
 <body>
     <div class="container">
@@ -120,20 +123,28 @@
     <script type="text/javascript">
 
         $(".image").on("click",function () {
-            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);
+{#            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);#}
+
+            var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
+{#            var URL = 'imgID_userinfo_transfer';#}
+            $.post(URL,data,function (response){
+{#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}
+            });
+
+{#            from js send data to python #}
+{#            $.ajax({#}
+{#                url: "imgID_userinfo_post",#}
+{#                type: "POST",#}
+{#                dataType: "json",#}
+{#                success: function (data) {#}
+{#                    console.log(data)#}
+{#                    alert(data.id);#}
+{#                }#}
+{#                })#}
+
         });
 
         $("#refresh").on('click', function() {
-            if(typeof(Storage) !== "undefined") {
-                if (sessionStorage.clickcount) {
-                    sessionStorage.clickcount = Number(sessionStorage.clickcount)+1;
-                } else {
-                    sessionStorage.clickcount = 1;
-                }
-            } else {
-                alert("Not support web storage");
-            }
-
             location.reload();
         });
     </script>
