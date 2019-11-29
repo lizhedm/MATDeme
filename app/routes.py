@@ -110,7 +110,10 @@ def get_movie_poster_withID(i):
         r = requests.get(movie_url)
         movie_info_dic = json.loads(r.text)
         poster = movie_info_dic['Poster']
-        return poster
+        if poster == 'N/A':
+            return default_poster_src
+        else:
+            return poster
     except:
         return default_poster_src
 
@@ -136,7 +139,9 @@ def user_background():
 
 @app.route('/movie_preview')
 def movie_preview():
-    return render_template('movie_preview.html',title = 'Film Recommendation')
+    i = range(50)
+    movie_id = generateIDs(50)
+    return render_template('movie_preview.html',title = 'Film Recommendation', i_movie_id = zip(i,movie_id))
 
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():
@@ -153,10 +158,9 @@ def imgID_userinfo_transfer():
     else:
         return 'fail'
 
-@app.route()
-def us:
-    # TODO
-    iids = recsys.get_recommendations(n)
+@app.route('/new_iids_for_recommendations',methods=['GET','POST'])
+def new_iids_for_recommendations():
+    iids = recsys.get_recommendations()
 
 
 @app.route('/movie_degree')

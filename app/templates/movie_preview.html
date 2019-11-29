@@ -72,53 +72,40 @@
 </head>
 <body>
     <div class="container">
-        {% with movieIDs = generateIDs(200), click_count = 0 %}
-{#            {% set click_count = get_click_count() %}#}
-            {% for i in range(0,100) %}
-                {% set click_count = i + 1 %}
+        {% with movieIDs = generateIDs(50), movie_id_len = 50, click_count = 0 %}
+
+{#            {% set movieIDs_present = movieIDs[0:12] %}#}
+            {% for i,movie_id in i_movie_id %}
+                {% if i is divisibleby(6) %}
+                    <div><label><br> <br>Block {{ (i / 6)|round|int }} <br></label></div>
+                    <form>
+                        <div class = 'image' id = {{ movie_id }}>
+                            <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>
+                            <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
+                        </div>
+                {% else %}
+                    <div class = 'image' id = {{ movie_id }}>
+                        <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>
+                        <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
+                    </div>
+                {% endif %}
+                    </form>
+
             {% endfor %}
-            {% set count = click_count * 6 %}
-            {% set movieID1 = movieIDs[0 + count] %}
-            {% set movieID2 = movieIDs[1 + count] %}
-            {% set movieID3 = movieIDs[2 + count] %}
-            {% set movieID4 = movieIDs[3 + count] %}
-            {% set movieID5 = movieIDs[4 + count] %}
-            {% set movieID6 = movieIDs[5 + count] %}
-            <div class="image" id={{ movieID1 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID1) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID1) }}</div>
-            </div>
-            <div class="image" id={{ movieID2 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID2) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID2) }}</div>
-            </div>
-            <div class="image" id={{ movieID3 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID3) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID3) }}</div>
-            </div>
-            <div class="image" id={{ movieID4 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID4) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID4) }}</div>
-            </div>
-            <div class="image" id={{ movieID5 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID5) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID5) }}</div>
-            </div>
-            <div class="image" id={{ movieID6 }}>
-                <a href="#"><img src = {{ get_movie_poster_withID(movieID6) }}></a>
-                <div class="text" id = 'movie_name'>{{ get_movie_name_withID(movieID6) }}</div>
-            </div>
+
+
         {% endwith %}
     </div>
 
-
-    <form>
-        <div>
-            <a href="{{ url_for('user_background') }}">Go back</a>
-            <a id="refresh" cl>Refresh</a>
-            <a href="{{ url_for('movie_degree') }}" >Next</a>
-        </div>
-    </form>
+    <div>
+        <form>
+            <div>
+                <a href="{{ url_for('user_background') }}">Go back</a>
+                <a id="refresh">Refresh</a>
+                <a href="{{ url_for('movie_degree') }}" >Next</a>
+            </div>
+        </form>
+    </div>
 
     <script type="text/javascript">
 
