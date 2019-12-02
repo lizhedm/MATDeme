@@ -140,8 +140,11 @@ def user_background():
 @app.route('/movie_preview')
 def movie_preview():
     i = range(50)
-    movie_id = generateIDs(50)
-    return render_template('movie_preview.html',title = 'Film Recommendation', i_movie_id = zip(i,movie_id))
+    movie_ids = generateIDs(50)
+    step = 6
+    group_movieIDs = [movie_ids[i:i + step] for i in range(0, len(movie_ids), step)]
+
+    return render_template('movie_preview.html',title = 'Film Recommendation', group_movieIDs = group_movieIDs)
 
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():
