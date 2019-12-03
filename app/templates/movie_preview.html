@@ -143,12 +143,17 @@
 {#            console.log('click_count = ' + click_count);#}
 {#            $('#container_h1').innerText = click_count.toString();#}
 {#        });#}
-        var image_click_count = 0;
         $(".image").on("click",function () {
 {#            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);#}
-            image_click_count++;
-            console.log('count'+image_click_count);
-            if(image_click_count === 10){
+
+                if(sessionStorage.image_click_count){
+                    sessionStorage.image_click_count = parseInt(sessionStorage.image_click_count) + 1;
+                }else {
+                    sessionStorage.image_click_count = 1;
+                }
+            console.log('count: '+sessionStorage.image_click_count);
+            if(parseInt(sessionStorage.image_click_count) === 10){
+                sessionStorage.image_click_count = 1;
                 alert('You have finished the task,10 movies have been choosed!');
             }
             var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};

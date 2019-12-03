@@ -162,16 +162,14 @@ def refresh_count():
 def imgID_userinfo_transfer():
 
     if request.method == 'POST':
-        id = request.values['id']
-        if id != '':
-            id = int(id)
+        the_id = request.values['id']
         gender = request.values['gender']
         occupation = request.values['occupation']
 
         demographic_info = (gender, occupation)
 
-        print('New user created! (id: {}, gender: {}, occ: {})'.format(id, gender, occupation))
-        iid_list.append(id)
+        print('New user created! (id: {}, gender: {}, occ: {})'.format(the_id, gender, occupation))
+        iid_list.append(the_id)
         if len(iid_list) == 10:
             recsys.build_user(iid_list, demographic_info)
         return 'success'
