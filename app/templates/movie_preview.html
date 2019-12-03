@@ -85,6 +85,7 @@
     </style>
     <script>
         URL = '{{ url_for('imgID_userinfo_transfer') }}'
+        refresh_count_URL = '{{ url_for('refresh_count') }}'
     </script>
 </head>
 <body>
@@ -93,62 +94,63 @@
     <div class="navbar">
         <a href="{{ url_for('user_background') }}">Go back</a>
         <a id="refresh">Refresh</a>
+{#        <a href="{{ url_for('movie_preview') }}">Refresh</a>#}
         <a href="{{ url_for('movie_degree') }}" >Next</a>
     </div>
 
-    <div class="container" refresh-value = 0>
-        {% with movieIDs = generateIDs(50), movie_id_len = 50 %}
+{#    {% with click_count = 3 %}#}
+        <div><h1 id = "container_h1"></h1></div>
+        <div class="container" id = "container">
 
-            {% for movie_id in group_movieIDs[1] %}
-                <form>
-                        <div class = 'image' id = {{ movie_id }}>
-                            <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>
-                            <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
-                        </div>
-                </form>
-            {% endfor %}
+                {% for movie_id in group_movieIDs[click_count] %}
+                    <form>
+                            <div class = 'image' id = {{ movie_id }}>
+                                <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>
+                                <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
+                            </div>
+                    </form>
+                {% endfor %}
 
-{#            {% for i,movie_id in i_movie_id %}#}
-{#                {% if i is divisibleby(6) %}#}
-{#                    <div><label><br> <br>Block {{ (i / 6)|round|int }} <br></label></div>#}
-{#                    <form>#}
-{#                        <div class = 'image' id = {{ movie_id }}>#}
-{#                            <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
-{#                            <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
-{#                        </div>#}
-{#                {% else %}#}
-{#                    <div class = 'image' id = {{ movie_id }}>#}
-{#                        <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
-{#                        <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
-{#                    </div>#}
-{#                {% endif %}#}
-{#                    </form>#}
-{##}
-{#            {% endfor %}#}
+    {#            {% for i,movie_id in i_movie_id %}#}
+    {#                {% if i is divisibleby(6) %}#}
+    {#                    <div><label><br> <br>Block {{ (i / 6)|round|int }} <br></label></div>#}
+    {#                    <form>#}
+    {#                        <div class = 'image' id = {{ movie_id }}>#}
+    {#                            <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
+    {#                            <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
+    {#                        </div>#}
+    {#                {% else %}#}
+    {#                    <div class = 'image' id = {{ movie_id }}>#}
+    {#                        <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
+    {#                        <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
+    {#                    </div>#}
+    {#                {% endif %}#}
+    {#                    </form>#}
+    {##}
+    {#            {% endfor %}#}
 
 
-        {% endwith %}
-    </div>
 
-{#    <div>#}
-{#        <form>#}
-{#            <div>#}
-{#                <a href="{{ url_for('user_background') }}">Go back</a>#}
-{#                <a id="refresh">Refresh</a>#}
-{#                <a href="{{ url_for('movie_degree') }}" >Next</a>#}
-{#            </div>#}
-{#        </form>#}
-{#    </div>#}
+        </div>
+{#    {% endwith %}#}
 
     <script type="text/javascript">
 
-        document.getElementsByTagName("BODY")[0].onload(){
-            sessionStorage.refresh_value = 0;
-        }
-
+{#        $(document).ready(function(){#}
+{#            sessionStorage.setItem('refresh_value',0);#}
+{#            var click_count = parseInt(sessionStorage.getItem('refresh_value'));#}
+{#            console.log('typeof(click_count)='+typeof(click_count))#}
+{#            console.log('click_count = ' + click_count);#}
+{#            $('#container_h1').innerText = click_count.toString();#}
+{#        });#}
+        var image_click_count = 0;
         $(".image").on("click",function () {
 {#            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);#}
-
+            image_click_count++;
+            console.log('count'+image_click_count);
+            if(image_click_count === 10){
+                alert('You have finished the task,10 movies have been choosed!');
+            }
             var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
 {#            var URL = 'imgID_userinfo_transfer';#}
             $.post(URL,data,function (response){
@@ -170,7 +172,22 @@
 
         $("#refresh").on('click', function() {
             if(typeof(Storage) !== "undefined") {
-                sessionStorage.refresh_value = sessionStorage.refresh_value + 1;
+                var refresh_value = parseInt(sessionStorage.getItem("refresh_value"));
+                if(refresh_value){
+                    refresh_value = refresh_value + 1;
+                    console.log('refresh_value = ' + refresh_value.toString())
+                    sessionStorage.setItem('refresh_value',refresh_value)
+                    document.getElementById('container_h1').innerText = refresh_value.toString();
+{#                    console.log('text is '+ $('#container_h1').html());#}
+                } else{
+                    sessionStorage.setItem('refresh_value',1);
+                }
+
+                var data = {'refresh_value':refresh_value};
+                    $.post(refresh_count_URL,data,function (response){
+{#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}
+            });
+
             } else {
                 alert("Not support web storage");
             }
