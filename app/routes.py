@@ -80,13 +80,13 @@ print('dataset params: {}'.format(dataset_args))
 print('task params: {}'.format(model_args))
 print('train params: {}'.format(train_args))
 
-recsys = PGATRecSys(num_recs=200, train_args=train_args, model_args=model_args, dataset_args=dataset_args)
+recsys = PGATRecSys(num_recs=10, train_args=train_args, model_args=model_args, dataset_args=dataset_args)
 refresh_value = 0
 
 @app.template_global()
 def generateIDs(n):
     movie_df = recsys.get_top_n_popular_items(n)
-    iids = [iid for iid in movie_df.iid]
+    iids = [iid for iid in movie_df.iid.values]
     return iids
 
 @app.template_global()
@@ -140,6 +140,7 @@ def user_background():
 
 @app.route('/movie_preview')
 def movie_preview():
+
     i = range(300)
     movie_ids = generateIDs(300)
     step = 6
@@ -160,29 +161,32 @@ def refresh_count():
 
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():
-
+    # import pdb
+    # pdb.set_trace()
     if request.method == 'POST':
         the_id = request.values['id']
+        the_id = int(the_id)
         gender = request.values['gender']
         occupation = request.values['occupation']
 
         demographic_info = (gender, occupation)
-
-        print('New user created! (id: {}, gender: {}, occ: {})'.format(the_id, gender, occupation))
         iid_list.append(the_id)
         if len(iid_list) == 10:
             recsys.build_user(iid_list, demographic_info)
+            print('New user created!')
         return 'success'
     else:
         return 'fail'
 
 @app.route('/new_iids_for_recommendations',methods=['GET','POST'])
 def new_iids_for_recommendations():
-    iids = recsys.get_recommendations()
+    pass
 
 
 @app.route('/movie_degree')
 def movie_degree():
+    iids = recsys.get_recommendations(iid_list)
+    print(iids)
     return render_template('movie_degree.html',title = 'Film Recommendation')
 
 @app.route('/recommendation_explanation')

@@ -71,23 +71,29 @@ class PGATRecSys(object):
         node_emb = self.model.node_emb.weight
         new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1]).weight
         node_emb = torch.cat((node_emb, new_user_emb), dim=0)
+        self.node_emb = self.model.forward_(node_emb, new_edge_index, new_sec_order_edge)
         self.new_user_emb = self.model.forward_(node_emb, new_edge_index, new_sec_order_edge)[-1, :]
         print('user building done...')
 
-    def get_recommendations(self):
+    def get_recommendations(self, seen_iids):
         # Estimate the feedback values and get the recommendation
-        iids = self.get_top_n_popular_items(self.num_recs + 10)
-        rec_iids = self.get_top_n_popular_items(100)
-        rec_iids = [iid for iid in rec_iids if rec_iids not in iids]
-        rec_nids = [self.data.iid2node_map[iid] for iid in rec_iids]
-        rec_item_emb = self.model.node_emb.weight[rec_nids]
-        est_feedback = torch.sum(self.new_user_emb * rec_item_emb, dim=1).reshape(-1).numpy()
-        rec_iid_idx = np.argsort(est_feedback)[self.num_recs]
+        iids = self.get_top_n_popular_items(200).iid
+        rec_iids = [iid for iid in iids if iid not in seen_iids]
+        rec_iids = np.random.choice(rec_iids, 20)
+        rec_nids = self.data.items[0].iloc[rec_iids].nid.values
+        rec_item_emb = self.node_emb[rec_nids]
+        est_feedback = torch.sum(self.new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
+        rec_iid_idx = np.argsort(est_feedback)[:self.num_recs]
         rec_iids = rec_iids[rec_iid_idx]
 
-        df = self.data.items[self.data.items.iid.isin(rec_iids)]
+        df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
 
-        return df
+        exp = get_explanation(df)
+
+        return df, exp
+
+    def get_explanation(self, df):
+        pass
 
     # @staticmethod
     # def get_weights_path(dataset_args, model_args, train_args):
