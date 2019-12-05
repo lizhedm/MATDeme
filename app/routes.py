@@ -185,9 +185,11 @@ def new_iids_for_recommendations():
 
 @app.route('/movie_degree')
 def movie_degree():
-    # iids = recsys.get_recommendations(iid_list)
+    # import pdb
+    # pdb.set_trace()
+    rec_movie_iids = recsys.get_recommendations(iid_list).iid.values
     # print(iids)
-    rec_movie_iids = {209,223,234,253,523,1223}
+    # rec_movie_iids = {209,223,234,253,523,1223}
     return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids = rec_movie_iids)
 
 @app.route('/score_movie_transfer',methods=['GET','POST'])
