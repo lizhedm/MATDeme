@@ -154,7 +154,8 @@
             console.log('count: '+sessionStorage.image_click_count);
             if(parseInt(sessionStorage.image_click_count) === 12){
                 sessionStorage.image_click_count = 1;
-                alert('You have finished the task,10 movies have been choosed!');
+                window.location.href = "{{ url_for('movie_degree') }}";
+{#                alert('You have finished the task,10 movies have been choosed!');#}
             }
             var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
 {#            var URL = 'imgID_userinfo_transfer';#}

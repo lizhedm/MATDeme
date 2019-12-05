@@ -88,9 +88,9 @@ class PGATRecSys(object):
 
         df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
 
-        exp = get_explanation(df)
+        # exp = get_explanation(df)
 
-        return df, exp
+        return df
 
     def get_explanation(self, df):
         pass

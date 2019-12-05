@@ -185,9 +185,20 @@ def new_iids_for_recommendations():
 
 @app.route('/movie_degree')
 def movie_degree():
-    iids = recsys.get_recommendations(iid_list)
-    print(iids)
-    return render_template('movie_degree.html',title = 'Film Recommendation')
+    # iids = recsys.get_recommendations(iid_list)
+    # print(iids)
+    rec_movie_iids = {209,223,234,253,523,1223}
+    return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids = rec_movie_iids)
+
+@app.route('/score_movie_transfer',methods=['GET','POST'])
+def score_movie_transfer():
+    if request.method == 'POST':
+        movie_id = request.values['id']
+        score = request.values['score']
+        print('get new data, movie_id:{},score:{}'.format(movie_id,score))
+        return 'success'
+    else:
+        return 'fail'
 
 @app.route('/recommendation_explanation')
 def recommendation_explanation():
