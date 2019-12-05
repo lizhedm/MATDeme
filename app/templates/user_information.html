@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{{ title }} - User Information</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-{#    <link rel="stylesheet" type="text/css" href="user_information.css">#}
+{#    <link rel="stylesheet" href="{{ url_for('static',filename='user_information.css') }}">#}
     <style type="text/css">
         body, html {
             margin:0;
@@ -47,8 +47,9 @@
           color: black;
         }
     </style>
+
 </head>
-<body>
+<body onload = 'initDefaultValue()'>
         <div class="navbar">
             <a href="{{ url_for('explanation') }}">Go back</a>
             <a href="{{ url_for('user_background') }}" >Next</a>
@@ -56,8 +57,8 @@
 
         <form>
           <div class="wrap">
-          <label class="tip">Your name: </label>
-          <input value="Zhe Li"/>
+          <label class="tip">Your ID: </label>
+          <input value=""/>
           </div>
          </form>
 
@@ -65,7 +66,7 @@
           <div class="wrap">
           <label class="tip">Gender:</label>
           <select id="gender">
-              <option value="M">Male</option>
+              <option value="M" selected="selected">Male</option>
               <option value="F">Female</option>
           </select>
          </div>
@@ -74,7 +75,7 @@
         <form>
           <div class="wrap">
           <label class="tip">Age</label>
-          <input type="radio" name="age" />0~18
+          <input type="radio" name="age" selected="selected" />0~18
           <input type="radio" name="age" />18~24
           <input type="radio" name="age" />25~34
           <input type="radio" name="age" />35~44
@@ -88,7 +89,7 @@
           <div class="wrap">
           <label class="tip">Occupation</label>
           <select id="occupation">
-              <option value="0">Other</option>
+              <option value="0" selected="selected">Other</option>
               <option value="1">academic/educator</option>
               <option value="2">artist</option>
               <option value="3">clerical/admin</option>
@@ -114,6 +115,16 @@
          </form>
 
         <script type="text/javascript">
+            function initDefaultValue(){
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.occupation_value = $("#occupation").children("option:selected").val();
+                    sessionStorage.gender_value = $("#gender").children("option:selected").val();
+                } else {
+                    alert("Not support web storage");
+                }
+            }
+
             $("#occupation").change(function () {
 {#                alert(this.value);#}
                 if(typeof(Storage) !== "undefined") {
