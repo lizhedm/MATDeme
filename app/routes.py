@@ -48,6 +48,7 @@ args = parser.parse_args()
 
 # save id selected by users
 iid_list = []
+iid_list2 = []
 
 __model__ = 'PGAT'
 
@@ -99,14 +100,17 @@ def get_movie_name_withID(i):
 def get_movie_poster_withID(i):
 
     # apikey = 'e760129c'
-    apikey = 'e44e5305'
+    # apikey = 'e44e5305'
+    apikey = '192c6b0e'
     movies = pd.read_csv('app/ml-1m/movies.dat', sep='::', engine='python')
     movie_name = get_movie_name_withID(i)
     movie_title = movie_name[0:-7]
+    movie_title = movie_title.replace(' ','+')
     movie_year = movie_name[-5:-1]
 
     movie_url = "http://www.omdbapi.com/?" + "t=" + movie_title + "&y=" + movie_year + "&apikey=" + apikey
 
+    # print('movie_url: ' + movie_url)
     try:
         r = requests.get(movie_url)
         movie_info_dic = json.loads(r.text)
@@ -187,13 +191,40 @@ def new_iids_for_recommendations():
 def movie_degree():
     # import pdb
     # pdb.set_trace()
-    rec_movie_iids = recsys.get_recommendations(iid_list).iid.values
+    df, exps = recsys.get_recommendations(iid_list)
+    rec_movie_iids = df.iid.values
     # print(iids)
     # rec_movie_iids = {209,223,234,253,523,1223}
-    return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids = rec_movie_iids)
+    return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids_and_explanations = zip(rec_movie_iids,exps))
 
 @app.route('/score_movie_transfer',methods=['GET','POST'])
 def score_movie_transfer():
+    if request.method == 'POST':
+        movie_id = request.values['id']
+        score = request.values['score']
+        print('get new data, movie_id:{},score:{}'.format(movie_id,score))
+        the_id = int(movie_id)
+        the_score = int(score)
+
+        if the_score >= 3 :
+            # build new iid list with ids which score >= 3
+            iid_list2.append(the_id)
+
+        return 'success'
+    else:
+        return 'fail'
+
+@app.route('/movie_degree2')
+def movie_degree2():
+
+    # print(iid_list2)
+    df, exps = recsys.get_recommendations(iid_list2)
+    rec_movie_iids2 = df.iid.values
+
+    return render_template('movie_degree2.html',title = 'Film Recommendation',rec_movie_iids_and_explanations2 = zip(rec_movie_iids2,exps))
+
+@app.route('/score_movie_transfer2',methods=['GET','POST'])
+def score_movie_transfer2():
     if request.method == 'POST':
         movie_id = request.values['id']
         score = request.values['score']

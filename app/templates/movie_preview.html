@@ -45,11 +45,18 @@
             margin: 5px;
             text-align: center;
         }
+
         img{
             width: 200px;
             height: 200px;
             margin: 5px;
         }
+
+        .selected {
+          border: 5px solid green;
+          margin: 0;
+        }
+
         .text{
             font: 12px caption;
             margin-bottom: 5px;
@@ -105,7 +112,7 @@
                 {% for movie_id in group_movieIDs[click_count] %}
                     <form>
                             <div class = 'image' id = {{ movie_id }}>
-                                <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>
+                                <a href="#"><img class = 'selectable' src = {{ get_movie_poster_withID(movie_id) }}></a>
                                 <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
                             </div>
                     </form>
@@ -135,7 +142,12 @@
 {#    {% endwith %}#}
 
     <script type="text/javascript">
-
+        function select(element) {
+          element.onclick = function() {
+            element.classList.toggle('selected');
+          }
+        }
+        Array.from(document.getElementsByClassName('selectable')).forEach(select);
 {#        $(document).ready(function(){#}
 {#            sessionStorage.setItem('refresh_value',0);#}
 {#            var click_count = parseInt(sessionStorage.getItem('refresh_value'));#}
@@ -146,13 +158,14 @@
         $(".image").on("click",function () {
 {#            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);#}
 
-                if(sessionStorage.image_click_count){
-                    sessionStorage.image_click_count = parseInt(sessionStorage.image_click_count) + 1;
-                }else {
-                    sessionStorage.image_click_count = 1;
-                }
+
+            if(sessionStorage.image_click_count){
+                sessionStorage.image_click_count = parseInt(sessionStorage.image_click_count) + 1;
+            }else {
+                sessionStorage.image_click_count = 1;
+            }
             console.log('count: '+sessionStorage.image_click_count);
-            if(parseInt(sessionStorage.image_click_count) === 12){
+            if(parseInt(sessionStorage.image_click_count) === 10){
                 sessionStorage.image_click_count = 1;
                 window.location.href = "{{ url_for('movie_degree') }}";
 {#                alert('You have finished the task,10 movies have been choosed!');#}

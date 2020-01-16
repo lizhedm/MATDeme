@@ -75,6 +75,9 @@ class PGATRecSys(object):
         self.new_user_emb = self.model.forward_(node_emb, new_edge_index, new_sec_order_edge)[-1, :]
         print('user building done...')
 
+    def extend_user(self, iids):
+        pass
+
     def get_recommendations(self, seen_iids):
         # Estimate the feedback values and get the recommendation
         iids = self.get_top_n_popular_items(200).iid
@@ -88,12 +91,12 @@ class PGATRecSys(object):
 
         df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
 
-        # exp = get_explanation(df)
+        exp = self.get_explanation(df)
 
-        return df
+        return df, exp
 
     def get_explanation(self, df):
-        pass
+        return ["some exp." for i in range(len(df))]
 
     # @staticmethod
     # def get_weights_path(dataset_args, model_args, train_args):

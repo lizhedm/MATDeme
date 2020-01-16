@@ -102,12 +102,12 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('movie_preview') }}">Go back</a>
-        <a href="{{ url_for('movie_degree2') }}" >Next</a>
+        <a href="{{ url_for('movie_degree') }}">Go back</a>
+        <a href="{{ url_for('recommendation_explanation') }}" >Next</a>
     </div>
 
     <div class="container" id = "container">
-        {% for movie_id, explanation in rec_movie_iids_and_explanations %}
+        {% for movie_id, explanation in rec_movie_iids_and_explanations2 %}
             <form>
                 <div class = 'image' id = {{ movie_id }}>
                     <a href="#"><img class = 'poster-img' src = {{ get_movie_poster_withID(movie_id) }}></a>
@@ -127,7 +127,7 @@
             size:8,
             click:function saveScores(score, evt){
                 var data = {'id':this.id,'score':score}
-                $.post('{{ url_for('score_movie_transfer') }}',data,function (response){
+                $.post('{{ url_for('score_movie_transfer2') }}',data,function (response){
                     if(response){}
                 });
                 alert('you selected '+ score + ' stars for the movie ' + this.id);
@@ -137,13 +137,3 @@
 
 </body>
 </html>
-
-{#movie: a,b,c...#}
-{#user: X,Y,Z...#}
-{##}
-{#explanation type:#}
-{##}
-{#user-based:         recommend a to X, because Y like a and Y is similar with X#}
-{#item-based:         recommend a to X, because X like b and b is similar with a#}
-{#content-based:      recommend a to X, because #}
-{#popularity-based:   recommend a to X, because X like type T and a is popular in type T#}
