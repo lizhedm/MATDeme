@@ -21,6 +21,7 @@
 
         form{
             margin:0 auto;
+            width: 18%;
             font-weight:bold;
         }
 
@@ -31,7 +32,7 @@
 
         .tip{
             width:40%;
-            padding-right:20px;
+            padding-right:10px;
             float:left;
             text-align: right;
         }
@@ -42,9 +43,9 @@
         .image{
             width: auto;
             height: auto;
-            border: 5px solid gray;
+            border: 1px solid gray;
             float: left;
-            margin: 5px;
+            margin: 1px;
             text-align: center;
         }
 {#        for star img#}
@@ -52,16 +53,27 @@
             width: 20px;
             height: 20px;
         }
+        .selected {
+          border: 5px solid green;
+          margin: 0;
+        }
+
         .star-raty{
             margin: auto;
-            width: 60%;
+            width: 80%;
 {#            border: 3px solid #73AD21;#}
-            padding: 5px;
+            padding: 1px;
         }
         .poster-img{
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
             margin: 5px;
+        }
+        p{
+            padding: 20px;
+            color: forestgreen;
+            font: 20px caption;
+            margin-bottom: 5px;
         }
         .text{
             font: 12px caption;
@@ -91,12 +103,12 @@
             margin: 50px auto;
             width: 1000px;
         }
-        a:hover > img{
-            transform: scale(1.5,1.5);
-            -webkit-transition: .3s transform;
-            -moz-transition: .3s transform;
-            transition: .3s transform;
-        }
+{#        a:hover > img{#}
+{#            transform: scale(1.5,1.5);#}
+{#            -webkit-transition: .3s transform;#}
+{#            -moz-transition: .3s transform;#}
+{#            transition: .3s transform;#}
+{#        }#}
 
     </style>
 </head>
@@ -104,6 +116,10 @@
     <div class="navbar">
         <a href="{{ url_for('movie_preview') }}">Go back</a>
         <a href="{{ url_for('movie_degree2') }}" >Next</a>
+    </div>
+
+    <div>
+        <p>Make the image selected if you watched this movie, and rate our recommendation reasons(1~5 points)</p>
     </div>
 
     <div class="container" id = "container">
@@ -121,6 +137,14 @@
 
 
     <script type="text/javascript">
+
+        function select(element) {
+          element.onclick = function() {
+            element.classList.toggle('selected');
+          }
+        }
+        Array.from(document.getElementsByClassName('poster-img')).forEach(select);
+
         $('.star-raty').raty({
             starOff:'https://image.flaticon.com/icons/png/128/149/149222.png',
             starOn:'https://image.flaticon.com/icons/png/128/148/148841.png',

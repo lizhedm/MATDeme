@@ -155,26 +155,33 @@
 {#            console.log('click_count = ' + click_count);#}
 {#            $('#container_h1').innerText = click_count.toString();#}
 {#        });#}
+
+        var id_list = [];
         $(".image").on("click",function () {
 {#            alert('id is ' + this.id + 'occupation value is' + sessionStorage.occupation_value);#}
 
+            if(!id_list.includes(this.id)){
+                id_list.push(this.id);
 
-            if(sessionStorage.image_click_count){
+                if(sessionStorage.image_click_count){
                 sessionStorage.image_click_count = parseInt(sessionStorage.image_click_count) + 1;
-            }else {
-                sessionStorage.image_click_count = 1;
+                }else {
+                    sessionStorage.image_click_count = 1;
+                }
+                console.log('count: '+sessionStorage.image_click_count);
+                if(parseInt(sessionStorage.image_click_count) === 10){
+                    sessionStorage.image_click_count = 0;
+                    id_list = [];
+                    window.location.href = "{{ url_for('movie_degree') }}";
+    {#                alert('You have finished the task,10 movies have been choosed!');#}
+                }
+                var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
+    {#            var URL = 'imgID_userinfo_transfer';#}
+                $.post(URL,data,function (response){
+    {#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}
+                });
             }
-            console.log('count: '+sessionStorage.image_click_count);
-            if(parseInt(sessionStorage.image_click_count) === 10){
-                sessionStorage.image_click_count = 1;
-                window.location.href = "{{ url_for('movie_degree') }}";
-{#                alert('You have finished the task,10 movies have been choosed!');#}
-            }
-            var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
-{#            var URL = 'imgID_userinfo_transfer';#}
-            $.post(URL,data,function (response){
-{#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}
-            });
+
 
 {#            from js send data to python #}
 {#            $.ajax({#}
