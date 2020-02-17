@@ -128,7 +128,7 @@ def get_movie_poster_withID(i):
 @app.route('/index')
 def index():
     user = {'username':'Zhe'}
-    return render_template('index.html', title = 'Film Recommendation', user = user)
+    return render_template('explanation.html', title = 'Film Recommendation', user = user)
 
 @app.route('/explanation')
 def explanation():
