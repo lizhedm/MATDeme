@@ -10,20 +10,18 @@ from torch_geometric.utils import path
 
 from torch_geometric.datasets import MovieLens
 
-from .pgat import PGATNetEx
+from .pgat import PAGATNet
 
 
 class PGATRecSys(object):
-    def __init__(self, num_recs, dataset_args, model_args, train_args):
+    def __init__(self, num_recs, dataset_args, model_args, device_args):
         self.num_recs = num_recs
-        self.train_args = train_args
+        self.device_args = device_args
 
-        self.data = MovieLens(**dataset_args).data.to(train_args['device'])
-        self.model = PGATNetEx(
-                self.data.num_nodes[0],
-                self.data.num_relations[0],
-                **model_args
-        ).to(train_args['device'])
+        self.data = MovieLens(**dataset_args).data.to(device_args['device'])
+
+        model_args['num_nodes'] = self.data.num_nodes[0]
+        self.model = PAGATNet(**model_args).to(device_args['device'])
 
     def get_top_n_popular_items(self, n=10):
         """
@@ -38,7 +36,7 @@ class PGATRecSys(object):
 
         ratings_df = self.data.ratings[0][['iid', 'movie_count']]
         ratings_df = ratings_df.drop_duplicates()
-        ratings_df = ratings_df.sort_index(axis=0, by='movie_count', ascending=False)
+        ratings_df = ratings_df.sort_values(by='movie_count', ascending=False)
 
         return ratings_df[:n]
 
@@ -84,7 +82,7 @@ class PGATRecSys(object):
         iids = self.get_top_n_popular_items(200).iid
         rec_iids = [iid for iid in iids if iid not in seen_iids]
         rec_iids = np.random.choice(rec_iids, 20)
-        rec_nids = [self.data.iid2nid[0][iid] for iid in rec_iids]
+        rec_nids = [self.data.e2nid[0]['iid'][iid] for iid in rec_iids]
         rec_item_emb = self.node_emb[rec_nids]
         est_feedback = torch.sum(self.new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
         rec_iid_idx = np.argsort(est_feedback)[:self.num_recs]
