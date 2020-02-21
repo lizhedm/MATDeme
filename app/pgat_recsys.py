@@ -9,10 +9,10 @@ import operator
 
 from torch_geometric.datasets import MovieLens
 
-from .pgat import PAGATNet
+from pgat import PAGATNet
 from torch_geometric.datasets import MovieLens
 from torch_geometric import utils
-from .utils import get_folder_path
+from utils import get_folder_path
 
 
 class PGATRecSys(object):
@@ -57,25 +57,18 @@ class PGATRecSys(object):
         new_user_occ_nid = self.data.e2nid[0]['occ'][demographic_info[1]]
         row = [self.new_user_nid for i in range(len(iids) + 2)]
         col = iids + [new_user_gender_nid, new_user_occ_nid]
-        self.new_edge_index = torch.from_numpy(np.array([row + col, col + row])).long().to(self.device_args['device'])
+        self.new_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
 
         # Build path begins and ends with
         path_from_new_user_np = utils.path.join(self.new_edge_index, self.data.edge_index)
-        path_to_new_user_np = utils.path.join(self.data.edge_index, self.new_edge_index)
+        path_to_new_user_np = np.flip(path_from_new_user_np, axis=0)
         new_path_np = np.concatenate([path_from_new_user_np, path_to_new_user_np], axis=1)
         self.new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
-        # new_edge_index_df = pd.DataFrame({'head': new_edge_index_np[0, :], 'middle': new_edge_index_np[1, :]})
-        # edge_index_np = self.data.edge_index.numpy()
-        # edge_index_df = pd.DataFrame({'middle': edge_index_np[0, :], 'tail': edge_index_np[1, :]})
-        # new_sec_order_edge_df = pd.merge(new_edge_index_df, edge_index_df, on='middle')
-        # new_sec_order_edge_np = new_sec_order_edge_df.to_numpy()
-        # new_sec_order_edge = torch.from_numpy(new_sec_order_edge_np).to(self.train_args['device']).t()
 
         # Get new user embedding by applying message passing
         self.new_user_emb = torch.nn.Embedding(1, self.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
-        self.new_path = self.new_path[self.new_path > 0]
-        self.new_user_emb, self.att_factor = self.model.forward(new_node_emb, self.new_path)[-1, :]
+        self.new_user_emb, _ = self.model.forward(new_node_emb, self.new_path)[-1, :]
         print('user building done...')
 
     def get_recommendations(self, seen_iids):
@@ -167,4 +160,4 @@ if __name__ == '__main__':
     print('device_args params: {}'.format(device_args))
 
     recsys = PGATRecSys(num_recs=10, dataset_args=dataset_args, model_args=model_args, device_args=device_args)
-    recsys.build_user(list(range(10)), ('M', '1'))
+    recsys.build_user(list(range(10)), ('M', 0))
