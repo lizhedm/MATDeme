@@ -174,10 +174,11 @@ def new_iids_for_recommendations():
 
 @app.route('/movie_degree')
 def movie_degree():
-    # import pdb
-    # pdb.set_trace()
-    df, exps = recsys.get_recommendations(iid_list)
+    import pdb
+    pdb.set_trace()
+    df = recsys.get_recommendations(iid_list)
     rec_movie_iids = df.iid.values
+    exps = ['' for i in range(rec_movie_iids.shape[0])]
     # print(iids)
     # rec_movie_iids = {209,223,234,253,523,1223}
     return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids_and_explanations = zip(rec_movie_iids,exps))

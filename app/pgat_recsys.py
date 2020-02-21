@@ -5,6 +5,7 @@ import pandas as pd
 import torch
 import os.path as osp
 import operator
+import pdb
 
 
 from torch_geometric.datasets import MovieLens
@@ -83,11 +84,12 @@ class PGATRecSys(object):
         rec_iids = rec_iids[rec_iid_idx]
 
         df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
-        iids = [iid for iid in df.iids.value]
+        pdb.set_trace()
+        iids = [iid for iid in df.iid.to_numpy()]
 
-        exp = [self.get_explanation(iid) for iid in iids]
+        # exp = [self.get_explanation(iid) for iid in iids]
 
-        return df, exp
+        return df
 
     def get_explanation(self, iid):
         movie_nid = self.data.iid2nid[iid]
