@@ -9,10 +9,10 @@ import operator
 
 from torch_geometric.datasets import MovieLens
 
-from pgat import PAGATNet
+from .pgat import PAGATNet
 from torch_geometric.datasets import MovieLens
 from torch_geometric import utils
-from utils import get_folder_path
+from .utils import get_folder_path
 
 
 class PGATRecSys(object):
