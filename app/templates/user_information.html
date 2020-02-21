@@ -14,7 +14,7 @@
         body {
             font: 12pt Arial, sans-serif;
             position: relative;
-            background-color: #eee;
+            background-color: white;
         }
 
         form{
@@ -52,13 +52,13 @@
 <body onload = 'initDefaultValue()'>
         <div class="navbar">
             <a href="{{ url_for('explanation') }}">Go back</a>
-            <a href="{{ url_for('user_background') }}" >Next</a>
+            <a id="user_background" >Next</a>
         </div>
 
         <form>
           <div class="wrap">
           <label class="tip">Your ID: </label>
-          <input value=""/>
+          <input id="user_id" value=""/>
           </div>
          </form>
 
@@ -75,13 +75,15 @@
         <form>
           <div class="wrap">
           <label class="tip">Age</label>
-          <input type="radio" name="age" selected="selected" />0~18
-          <input type="radio" name="age" />18~24
-          <input type="radio" name="age" />25~34
-          <input type="radio" name="age" />35~44
-          <input type="radio" name="age" />45~49
-          <input type="radio" name="age" />50~55
-          <input type="radio" name="age">56+
+          <select id="age">
+              <option value="0" selected="selected">0~18</option>
+              <option value="1">18~24</option>
+              <option value="2">25~34</option>
+              <option value="3">35~44</option>
+              <option value="4">45~49</option>
+              <option value="5">50~55</option>
+              <option value="6">56+</option>
+          </select>
          </div>
          </form>
 
@@ -147,6 +149,22 @@
                     alert("Not support web storage");
                 }
             });
+
+            $("#user_background").on('click',function () {
+
+                user_id = $("#user_id").val();
+                gender = $("#gender").children("option:selected").val();
+                occupation = $("#occupation").children("option:selected").val();
+                age = $("#age").children("option:selected").val();
+{#                alert('user_id:'+user_id+'gender:'+gender+'occupation:'+occupation+'age:'+age);#}
+                if(user_id && gender && occupation && age){
+                    location.href = "{{ url_for('user_background') }}";
+                } else {
+                    alert("Please input all the information");
+                }
+
+            })
+
         </script>
 
 </body>

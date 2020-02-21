@@ -49,6 +49,7 @@ args = parser.parse_args()
 # save id selected by users
 iid_list = []
 iid_list2 = []
+iid_list3 = []
 
 __model__ = 'PGAT'
 
@@ -232,6 +233,15 @@ def score_movie_transfer2():
         return 'success'
     else:
         return 'fail'
+
+@app.route('/movie_degree3')
+def movie_degree3():
+
+    # print(iid_list3)
+    df, exps = recsys.get_recommendations(iid_list3)
+    rec_movie_iids3 = df.iid.values
+
+    return render_template('movie_degree3.html',title = 'Film Recommendation',rec_movie_iids_and_explanations3 = zip(rec_movie_iids3,exps))
 
 @app.route('/recommendation_explanation')
 def recommendation_explanation():

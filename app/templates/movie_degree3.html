@@ -115,15 +115,12 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('movie_degree') }}">Go back</a>
-        <a href="{{ url_for('movie_degree3') }}" >Next</a>
-    </div>
-    <div>
-        <p>Make the image selected if you watched this movie, and rate our recommendation reasons(1~5 points)</p>
+        <a href="{{ url_for('movie_degree2') }}">Go back</a>
     </div>
 
+
     <div class="container" id = "container">
-        {% for movie_id, explanation in rec_movie_iids_and_explanations2 %}
+        {% for movie_id, explanation in rec_movie_iids_and_explanations3 %}
             <form>
                 <div class = 'image' id = {{ movie_id }}>
                     <a href="#"><img class = 'poster-img' src = {{ get_movie_poster_withID(movie_id) }}></a>

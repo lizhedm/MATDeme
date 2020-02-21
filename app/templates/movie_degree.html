@@ -16,7 +16,7 @@
         body {
             font: 12pt Arial, sans-serif;
             position: relative;
-            background-color: #eee;
+            background-color: white;
         }
 
         form{
@@ -154,7 +154,7 @@
                 $.post('{{ url_for('score_movie_transfer') }}',data,function (response){
                     if(response){}
                 });
-                alert('you selected '+ score + ' stars for the movie ' + this.id);
+{#                alert('you selected '+ score + ' stars for the movie ' + this.id);#}
             }
         });
     </script>
