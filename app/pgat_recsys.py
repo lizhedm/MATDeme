@@ -9,10 +9,10 @@ import operator
 
 from torch_geometric.datasets import MovieLens
 
-from pgat import PAGATNet
+from .pgat import PAGATNet
 from torch_geometric.datasets import MovieLens
 from torch_geometric import utils
-from utils import get_folder_path
+from .utils import get_folder_path
 
 
 class PGATRecSys(object):
@@ -54,7 +54,7 @@ class PGATRecSys(object):
         # Build edges for new user
         self.new_user_nid = self.node_emb.weight.shape[0]
         new_user_gender_nid = self.data.e2nid[0]['gender'][demographic_info[0]]
-        new_user_occ_nid = self.data.e2nid[0]['occ'][demographic_info[1]]
+        new_user_occ_nid = self.data.e2nid[0]['occ'][int(demographic_info[1])]
         row = [self.new_user_nid for i in range(len(iids) + 2)]
         col = iids + [new_user_gender_nid, new_user_occ_nid]
         self.new_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
@@ -68,7 +68,7 @@ class PGATRecSys(object):
         # Get new user embedding by applying message passing
         self.new_user_emb = torch.nn.Embedding(1, self.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
-        self.new_user_emb, _ = self.model.forward(new_node_emb, self.new_path)[-1, :]
+        self.new_user_emb = self.model.forward(new_node_emb, self.new_path)[-1, :]
         print('user building done...')
 
     def get_recommendations(self, seen_iids):
