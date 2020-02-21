@@ -9,10 +9,10 @@ import operator
 
 from torch_geometric.datasets import MovieLens
 
-from pgat import PAGATNet
+from .pgat import PAGATNet
 from torch_geometric.datasets import MovieLens
 from torch_geometric import utils
-from utils import get_folder_path
+from .utils import get_folder_path
 
 
 class PGATRecSys(object):
@@ -74,6 +74,7 @@ class PGATRecSys(object):
         # Get new user embedding by applying message passing
         self.new_user_emb = torch.nn.Embedding(1, self.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
+        self.new_path = self.new_path[self.new_path > 0]
         self.new_user_emb, self.att_factor = self.model.forward(new_node_emb, self.new_path)[-1, :]
         print('user building done...')
 
