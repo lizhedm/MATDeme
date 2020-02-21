@@ -163,6 +163,7 @@ def refresh_count():
         global refresh_value
         if temp_refresh_value != '':
             refresh_value = int(temp_refresh_value)
+            return 'success'
 
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():

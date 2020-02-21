@@ -199,6 +199,9 @@
         $("#refresh").on('click', function() {
             if(typeof(Storage) !== "undefined") {
                 var refresh_value = parseInt(sessionStorage.getItem("refresh_value"));
+                if(isNaN(refresh_value)){
+                    refresh_value = 0;
+                }
                 if(refresh_value){
                     refresh_value = refresh_value + 1;
                     console.log('refresh_value = ' + refresh_value.toString())
@@ -206,6 +209,7 @@
                     document.getElementById('container_h1').innerText = refresh_value.toString();
 {#                    console.log('text is '+ $('#container_h1').html());#}
                 } else{
+                    refresh_value = 1;
                     sessionStorage.setItem('refresh_value',1);
                 }
 
