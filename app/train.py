@@ -65,3 +65,4 @@ print('task params: {}'.format(model_args))
 print('train params: {}'.format(train_args))
 
 if __name__ == '__main__':
+    pass
