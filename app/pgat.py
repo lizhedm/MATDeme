@@ -16,5 +16,6 @@ class PAGATNet(torch.nn.Module):
         self.conv.reset_parameters()
 
     def forward(self, x, path):
-        return self.conv(x, path)
+        x, att = self.conv(x, path)
+        return x, att
 
