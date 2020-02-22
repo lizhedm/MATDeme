@@ -211,18 +211,20 @@ def movie_degree():
 
 @app.route('/score_movie_transfer',methods=['GET','POST'])
 def score_movie_transfer():
+    global iid_list2
     if request.method == 'POST':
         user_id = request.values['user_id']
         movie_id = request.values['movie_id']
         seen_status = request.values['seen_status']
         explanation = request.values['explanation']
         score = request.values['score']
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
-        the_id = int(movie_id)
-        the_score = int(score)
         user_study_round = "1"
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+
         save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
 
+        the_id = int(movie_id)
+        the_score = int(score)
         if the_score >= 3 :
             # build new iid list with ids which score >= 3
             iid_list2.append(the_id)
@@ -245,18 +247,20 @@ def movie_degree2():
 
 @app.route('/score_movie_transfer2',methods=['GET','POST'])
 def score_movie_transfer2():
+    global iid_list3
     if request.method == 'POST':
         user_id = request.values['user_id']
         movie_id = request.values['movie_id']
         seen_status = request.values['seen_status']
         explanation = request.values['explanation']
         score = request.values['score']
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
-        the_id = int(movie_id)
-        the_score = int(score)
         user_study_round = "2"
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+
         save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
 
+        the_id = int(movie_id)
+        the_score = int(score)
         if the_score >= 3 :
             # build new iid list with ids which score >= 3
             iid_list3.append(the_id)
@@ -285,10 +289,9 @@ def score_movie_transfer3():
         seen_status = request.values['seen_status']
         explanation = request.values['explanation']
         score = request.values['score']
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
-        the_id = int(movie_id)
-        the_score = int(score)
         user_study_round = "3"
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+
         save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
 
         return 'success'
