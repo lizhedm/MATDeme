@@ -68,8 +68,5 @@ print('train params: {}'.format(train_args))
 if __name__ == '__main__':
     data = MovieLens(**dataset_args).data.to(train_args['device'])
     paths = data.train_path[0]
-    nid2e = data.nid2e[0]
-    for i in range(10):
-        p = paths[:, i]
-        print(str(nid2e[p[0]]) + '--' + str(nid2e[p[1]]) + '--' + str(nid2e[p[2]]))
+    node_emb = torch.nn.Embedding(data.num_nodes[0], model_args['emb_dim'], max_norm=1, norm_type=2.0)
     model = PAGATNet(**model_args).to(train_args['device'])
