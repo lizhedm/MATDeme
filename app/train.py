@@ -70,3 +70,6 @@ if __name__ == '__main__':
     paths = data.train_path[0]
     node_emb = torch.nn.Embedding(data.num_nodes[0], model_args['emb_dim'], max_norm=1, norm_type=2.0)
     model = PAGATNet(**model_args).to(train_args['device'])
+
+    loss_func
+    for epoch in range(args.epochs):
