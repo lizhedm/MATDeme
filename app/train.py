@@ -1,7 +1,9 @@
 import argparse
 import torch
+from torch_geometric.datasets import MovieLens
 
-from .utils import get_folder_path
+from pgat import PAGATNet
+from utils import get_folder_path
 
 __model__ = 'PGAT'
 
@@ -35,7 +37,7 @@ parser.add_argument("--early_stopping", type=int, default=40, help="")
 args = parser.parse_args()
 
 # Setup data and weights file path
-data_folder, weights_folder, logger_folder = get_folder_path(__model__, args.dataset + args.dataset_name)
+data_folder, weights_folder, logger_folder = get_folder_path(args.dataset + args.dataset_name)
 
 # Setup device
 if not torch.cuda.is_available() or args.device == 'cpu':
@@ -50,8 +52,7 @@ dataset_args = {
     'debug': args.debug
 }
 model_args = {
-    'heads': args.heads, 'hidden_size': args.hidden_size, 'emb_dim': args.emb_dim,
-    'repr_dim': args.repr_dim
+    'heads': args.heads, 'emb_dim': args.emb_dim, 'repr_dim': args.repr_dim
 }
 train_args = {
     'debug': args.debug, 'runs': args.runs,
@@ -65,4 +66,10 @@ print('task params: {}'.format(model_args))
 print('train params: {}'.format(train_args))
 
 if __name__ == '__main__':
-    pass
+    data = MovieLens(**dataset_args).data.to(train_args['device'])
+    paths = data.train_path[0]
+    nid2e = data.nid2e[0]
+    for i in range(10):
+        p = paths[:, i]
+        print(str(nid2e[p[0]]) + '--' + str(nid2e[p[1]]) + '--' + str(nid2e[p[2]]))
+    model = PAGATNet(**model_args).to(train_args['device'])

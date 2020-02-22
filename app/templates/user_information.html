@@ -119,13 +119,23 @@
         <script type="text/javascript">
             function initDefaultValue(){
                 if(typeof(Storage) !== "undefined") {
-
+                    sessionStorage.user_id = $("#user_id").val();
                     sessionStorage.occupation_value = $("#occupation").children("option:selected").val();
                     sessionStorage.gender_value = $("#gender").children("option:selected").val();
                 } else {
                     alert("Not support web storage");
                 }
             }
+
+            $('#user_id').change(function () {
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.user_id = this.value;
+{#                    alert(sessionStorage.user_id);#}
+                } else {
+                    alert("Not support web storage");
+                }
+            });
 
             $("#occupation").change(function () {
 {#                alert(this.value);#}

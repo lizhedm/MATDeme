@@ -126,11 +126,11 @@
         {% for movie_id, explanation in rec_movie_iids_and_explanations %}
             <form>
                 <div class = 'image' id = {{ movie_id }}>
-                    <a href="#"><img class = 'poster-img' src = {{ get_movie_poster_withID(movie_id) }}></a>
-                    <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>
-                    <div class = 'explanation'>{{ explanation }}</div>
+                    <a href="#"><img class = 'poster-img' id = 'poster-img_{{ movie_id }}' src = {{ get_movie_poster_withID(movie_id) }}></a>
+                    <div class = 'text' id = 'movie_name_{{ movie_id }}'>{{ get_movie_name_withID(movie_id) }}</div>
+                    <div class = 'explanation' id = 'explanation_{{ movie_id }}'>{{ explanation }}</div>
+                    <div class = 'star-raty' id = {{ movie_id }}></div>
                 </div>
-                <div class = 'star-raty' id = {{ movie_id }}></div>
             </form>
         {% endfor %}
     </div>
@@ -150,7 +150,27 @@
             starOn:'https://image.flaticon.com/icons/png/128/148/148841.png',
             size:8,
             click:function saveScores(score, evt){
-                var data = {'id':this.id,'score':score}
+                var seen_status = 0;
+                var all_selected_poster_img_elements = $('.poster-img.selected');
+                var poster_img_id = 'poster-img_'+this.id;
+                for(i = 0;i < all_selected_poster_img_elements.length;i++){
+{#                    alert(0);#}
+                    if(String(all_selected_poster_img_elements[i].id) === poster_img_id){
+                        seen_status = 1;
+{#                        alert(1);#}
+                    }
+                }
+
+
+
+
+{#                var explanation_id = 'explanation_'+this.id;#}
+{#                var explanation = $("#"+explanation_id).innerText;#}
+{#                alert('explanation_id'+explanation_id);#}
+{#                alert('explanation'+explanation);#}
+                var explanation = 'exp';
+                var data = {'user_id':sessionStorage.user_id,'movie_id':this.id,'seen_status':seen_status,'explanation':explanation,'score':score}
+                alert('user_id'+sessionStorage.user_id+'movie_id'+this.id+'seen_status'+seen_status+'explanation'+explanation+'score'+score);
                 $.post('{{ url_for('score_movie_transfer') }}',data,function (response){
                     if(response){}
                 });

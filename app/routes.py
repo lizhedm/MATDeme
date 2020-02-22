@@ -4,6 +4,8 @@ import pandas as pd
 import requests
 # from django.http import HttpResponse
 import json
+import sqlite3
+import os.path
 import random
 import argparse
 import torch
@@ -40,6 +42,7 @@ args = parser.parse_args()
 iid_list = []
 iid_list2 = []
 iid_list3 = []
+demographic_info = ()
 
 ########################## Define arguments ##########################
 data_folder, weights_folder, logger_folder = get_folder_path(args.dataset + args.dataset_name)
@@ -106,6 +109,24 @@ def get_movie_poster_withID(i):
     except:
         return default_poster_src
 
+@app.template_global()
+def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,explanation_score,user_study_round):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "MATDemo.db")
+    connection = sqlite3.connect(db_path)
+
+    cursor = connection.cursor()
+    print("Opened database successfully")
+
+    cursor.execute('create table if not exists EXP_SCORE (user_id,movie_id,seen_status,explanation,explanation_score,user_study_round)')
+    params = (user_id,movie_id,seen_status,explanation,explanation_score,user_study_round)
+
+    cursor.execute("INSERT INTO EXP_SCORE VALUES (?,?,?,?,?,?)",params)
+    connection.commit()
+    print("Records created successfully")
+
+    connection.close()
+    return 1
 
 
 @app.route('/')
@@ -150,6 +171,7 @@ def refresh_count():
 
 @app.route('/imgID_userinfo_transfer',methods=['GET','POST'])
 def imgID_userinfo_transfer():
+    global demographic_info
     # import pdb
     # pdb.set_trace()
     if request.method == 'POST':
@@ -161,8 +183,7 @@ def imgID_userinfo_transfer():
         demographic_info = (gender, occupation)
         iid_list.append(the_id)
         if len(iid_list) == 10:
-            recsys.build_user(iid_list, demographic_info)
-            print('New user created!')
+            print('creating new user...')
         return 'success'
     else:
         return 'fail'
@@ -176,20 +197,30 @@ def new_iids_for_recommendations():
 def movie_degree():
     # import pdb
     # pdb.set_trace()
-    df, exps = recsys.get_recommendations(iid_list)
+    global iid_list
+    global demographic_info
+    recsys.build_user(iid_list, demographic_info)
+    print('new user created')
+    df, exps = recsys.get_recommendations()
     rec_movie_iids = df.iid.values
     # print(iids)
-    # rec_movie_iids = {209,223,234,253,523,1223}
+    # rec_movie_iids = {209,223,234,253,523,1223,334,438,555,619}
+    # exps = {'exp209','exp223','exp234','exp253','exp523','exp1223','exp334','exp438','exp555','exp619'}
     return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids_and_explanations = zip(rec_movie_iids,exps))
 
 @app.route('/score_movie_transfer',methods=['GET','POST'])
 def score_movie_transfer():
     if request.method == 'POST':
-        movie_id = request.values['id']
+        user_id = request.values['user_id']
+        movie_id = request.values['movie_id']
+        seen_status = request.values['seen_status']
+        explanation = request.values['explanation']
         score = request.values['score']
-        print('get new data, movie_id:{},score:{}'.format(movie_id,score))
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
         the_id = int(movie_id)
         the_score = int(score)
+        user_study_round = "1"
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
 
         if the_score >= 3 :
             # build new iid list with ids which score >= 3
@@ -203,17 +234,32 @@ def score_movie_transfer():
 def movie_degree2():
 
     # print(iid_list2)
-    df, exps = recsys.get_recommendations(iid_list2)
+    global iid_list2
+    global demographic_info
+    new_iids = recsys.base_iids + iid_list2
+    recsys.build_user(new_iids, demographic_info)
+    df, exps = recsys.get_recommendations()
     rec_movie_iids2 = df.iid.values
-
     return render_template('movie_degree2.html',title = 'Film Recommendation',rec_movie_iids_and_explanations2 = zip(rec_movie_iids2,exps))
 
 @app.route('/score_movie_transfer2',methods=['GET','POST'])
 def score_movie_transfer2():
     if request.method == 'POST':
-        movie_id = request.values['id']
+        user_id = request.values['user_id']
+        movie_id = request.values['movie_id']
+        seen_status = request.values['seen_status']
+        explanation = request.values['explanation']
         score = request.values['score']
-        print('get new data, movie_id:{},score:{}'.format(movie_id,score))
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
+        the_id = int(movie_id)
+        the_score = int(score)
+        user_study_round = "2"
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
+
+        if the_score >= 3 :
+            # build new iid list with ids which score >= 3
+            iid_list3.append(the_id)
+
         return 'success'
     else:
         return 'fail'
@@ -221,11 +267,32 @@ def score_movie_transfer2():
 @app.route('/movie_degree3')
 def movie_degree3():
 
-    # print(iid_list3)
-    df, exps = recsys.get_recommendations(iid_list3)
+    global iid_list3
+    global demographic_info
+    new_iids = recsys.base_iids + iid_list3
+    recsys.build_user(new_iids, demographic_info)
+    df, exps = recsys.get_recommendations()
     rec_movie_iids3 = df.iid.values
 
     return render_template('movie_degree3.html',title = 'Film Recommendation',rec_movie_iids_and_explanations3 = zip(rec_movie_iids3,exps))
+
+@app.route('/score_movie_transfer3',methods=['GET','POST'])
+def score_movie_transfer3():
+    if request.method == 'POST':
+        user_id = request.values['user_id']
+        movie_id = request.values['movie_id']
+        seen_status = request.values['seen_status']
+        explanation = request.values['explanation']
+        score = request.values['score']
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{}'.format(user_id,movie_id,seen_status,explanation,score))
+        the_id = int(movie_id)
+        the_score = int(score)
+        user_study_round = "3"
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
+
+        return 'success'
+    else:
+        return 'fail'
 
 @app.route('/recommendation_explanation')
 def recommendation_explanation():
@@ -241,6 +308,7 @@ def recommendation_evaluation():
 #     testInfo['id'] = '456'
 #     testInfo['occupation'] = '2'
 #     return json.dumps(testInfo)
+
 
 
 
