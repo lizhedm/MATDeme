@@ -201,6 +201,7 @@ def movie_degree():
     global demographic_info
     recsys.build_user(iid_list, demographic_info)
     print('new user created')
+
     df, exps = recsys.get_recommendations()
     rec_movie_iids = df.iid.values
     # print(iids)
