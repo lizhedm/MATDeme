@@ -101,23 +101,21 @@ class PGATRecSys(object):
 
         e = self.data.nid2e[0][opt_path[0]]
 
-        exp = "you are recommended with movie "
         try:
             if e[0] == 'uid':
-                expl = exp + "{} because you are similar to user {}".format(
-                    self.data.items[0].iloc[iid, :].title, e[1])
+                expl = '__Uiduid0-Iid{}-Uid{}__'.format(iid, e[1])
             elif e[0] == 'iid':
-                expl = exp + "{} based on the movie {} you have seen".format(
+                expl = '__Iid{}-Uiduid0-Iid{}__'.format(
                     self.data.items[0].iloc[iid, :].title,
                     self.data.items[0].iloc[e[1], :].title)
             elif e[0] == 'gender' or e[0] == 'occ':
-                expl = exp + "{} because your {} is {}.".format(
+                expl = '__Iid{}-Uiduid0-DFType{}-DFValue{}__'.format(
                     self.data.items[0].iloc[iid, :].title,
                     e[0],
                     e[1]
                 )
             else:
-                expl = exp + "{} because the movie has the {} feature {}.".format(
+                expl = '__Uiduid0-Iid{}-CFType{}-CFValue{}__'.format(
                     self.data.items[0].iloc[iid, :].title,
                     e[0],
                     e[1]
