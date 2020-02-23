@@ -53,7 +53,7 @@ class PGATRecSys(object):
         self.new_user_nid = self.node_emb.weight.shape[0]
 
         new_user_gender_nid = self.data.e2nid[0]['gender'][demographic_info[0]]
-        new_user_occ_nid = self.data.e2nid[0]['occ'][int(demographic_info[1])]
+        new_user_occ_nid = self.data.e2nid[0]['occ'][demographic_info[1]]
         row = [self.new_user_nid for i in range(len(iids) + 2)]
         col = iids + [new_user_gender_nid, new_user_occ_nid]
         self.new_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
@@ -94,7 +94,7 @@ class PGATRecSys(object):
         col = [movie_nid, self.new_user_nid]
         expl_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
         exist_edge_index = torch.cat((self.data.edge_index, self.new_edge_index), dim=1)
-        path_from_new_user_item_np = utils.path.join(expl_edge_index, exist_edge_index)
+        path_from_new_user_item_np = utils.path.join(exist_edge_index, expl_edge_index)
         path_to_new_user_item_np = np.flip(path_from_new_user_item_np, axis=0)
         new_path_np = np.concatenate([path_from_new_user_item_np, path_to_new_user_item_np], axis=1)
         new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
