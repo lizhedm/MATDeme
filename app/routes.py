@@ -79,6 +79,7 @@ def generateIDs(n):
 
 @app.template_global()
 def get_movie_name_withID(i):
+    i = int(i)
     movies = pd.read_csv('app/ml-1m/movies.dat', sep='::', engine='python')
     movie_name = movies['MovieName'][i]
     return movie_name
@@ -208,6 +209,13 @@ def movie_degree():
     # rec_movie_iids = {209,223,234,253,523,1223,334,438,555,619}
     # exps = {'exp209','exp223','exp234','exp253','exp523','exp1223','exp334','exp438','exp555','exp619'}
     return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids_and_explanations = zip(rec_movie_iids,exps))
+
+@app.route('/movie_name_transfer',methods=['GET','POST'])
+def movie_name_transfer():
+    if request.method == 'POST':
+        movie_id = request.values['movie_id']
+        movie_name = get_movie_name_withID(movie_id)
+        return movie_name
 
 @app.route('/score_movie_transfer',methods=['GET','POST'])
 def score_movie_transfer():

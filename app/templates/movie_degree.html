@@ -20,7 +20,9 @@
         }
 
         form{
-            margin:0 auto;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 5px;
             width: 18%;
             font-weight:bold;
         }
@@ -138,12 +140,88 @@
 
     <script type="text/javascript">
 
+        $.ajaxSetup({async: false});
+
         function select(element) {
           element.onclick = function() {
             element.classList.toggle('selected');
           }
         }
         Array.from(document.getElementsByClassName('poster-img')).forEach(select);
+
+        function reset_explanation_text(element){
+{#            var original_text = element.innerHTML;#}
+            var upper_text;
+            var split_text_list;
+            var explanation_text;
+{#            var original_text = 'Uid133-Iid321-Uid456';#}
+            var original_text = 'Iid330-Uid321-Iid456';
+            upper_text = original_text.replace( /[^A-Z]/g, '' );
+
+            split_text_list = original_text.split('-');
+
+            if(upper_text === 'UIU'){
+{#                user-based recommendation#}
+{#                (uid_x) is recommended with (iid_a) because (uid_y) is similar with (uid_x) and (uid_y) likes (iid_a)#}
+                var uid1 = split_text_list[0].substr(3);
+                var iid1 = split_text_list[1].substr(3);
+                var uid2 = split_text_list[2].substr(3);
+{#                alert('uid1='+uid1+'iid1='+iid1+'uid2='+uid2);#}
+{#                BUG:can not send parameter into flask {{  }}#}
+{#                var movie_name1 = {{ get_movie_name_withID(iid1) }};#}
+                var movie_name1;
+                var movie_data = {'movie_id':iid1};
+
+                $.post('{{ url_for('movie_name_transfer') }}',movie_data,function (response){
+                    if(response){
+                        movie_name1 = response;
+{#                        alert('movie_name1111:'+movie_name1);#}
+
+                    }
+                });
+{#                alert('movie_name2221:'+movie_name1);#}
+                explanation_text = 'User ' + uid1 + ' is recommended with ' + movie_name1 + ' because user ' + uid2 + ' is similar with user' + uid1 + ' and user ' + uid2 + ' likes ' + movie_name1;
+
+            } else if(upper_text === 'IUI'){
+{#                item-based recommendation#}
+{#                (iid_a) is recommended to (uid_x) because that (iid_a) is similar with (iid_b) which (uid_x) liked before.#}
+                var iid1 = split_text_list[0].substr(3);
+                var uid1 = split_text_list[1].substr(3);
+                var iid2 = split_text_list[2].substr(3);
+
+                var movie_name1;
+                var movie_name2;
+                var movie_data1 = {'movie_id':iid1};
+                var movie_data2 = {'movie_id':iid2};
+
+                $.post('{{ url_for('movie_name_transfer') }}',movie_data1,function (response){
+                    if(response){
+                        movie_name1 = response;
+                    }
+                });
+
+                $.post('{{ url_for('movie_name_transfer') }}',movie_data2,function (response){
+                    if(response){
+                        movie_name2 = response;
+                    }
+                });
+
+                explanation_text = movie_name1 + ' is recommended to user ' + uid1 + ' because that this movie ' + ' is similar with ' + movie_name2 + ' which user ' + uid1 + ' liked before.';
+
+            } else if(upper_text === 'IUDFTDFV'){
+{#                demographic-based#}
+                explanation_text = '';
+
+            } else if(upper_text === 'IUCFTCFV'){
+{#                content-based#}
+                explanation_text = '';
+
+            } else {}
+
+            element.innerHTML = explanation_text;
+
+        }
+        Array.from($(".explanation")).forEach(reset_explanation_text);
 
         $('.star-raty').raty({
             starOff:'https://image.flaticon.com/icons/png/128/149/149222.png',
