@@ -98,22 +98,32 @@ class PGATRecSys(object):
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
         att = self.model.forward(new_node_emb, new_path)[1]
         opt_path = new_path[:, torch.argmax(att)].numpy()
-        try:
-            e1 = self.data.nid2e[0][opt_path[0]]
-        except:
-            e1 = ('uid', -1)
 
-        try:
-            e2 = self.data.nid2e[0][opt_path[1]]
-        except:
-            e2 = ('uid', -1)
+        e = self.data.nid2e[0][opt_path[0]]
 
+        exp = "you are recommended with movie "
         try:
-            e3 = self.data.nid2e[0][opt_path[2]]
+            if e[0] == 'uid':
+                expl = exp + "{} because you are similar to user {}".format(
+                    self.data.items[0].iloc[iid, :].title, e[1])
+            elif e[0] == 'iid':
+                expl = exp + "{} based on the movie {} you have seen".format(
+                    self.data.items[0].iloc[iid, :].title,
+                    self.data.items[0].iloc[e[1], :].title)
+            elif e[0] == 'gender' or e[0] == 'occ':
+                expl = exp + "{} because your {} is {}.".format(
+                    self.data.items[0].iloc[iid, :].title,
+                    e[0],
+                    e[1]
+                )
+            else:
+                expl = exp + "{} because the movie has the {} feature {}.".format(
+                    self.data.items[0].iloc[iid, :].title,
+                    e[0],
+                    e[1]
+                )
         except:
-            e3 = ('uid', -1)
-
-        expl = e1[0] + str(e1[1]) + '--' + e2[0] + str(e2[1]) + '--' + e3[0] + str(e3[1])
+            expl = 'error'
         return expl
 
 
