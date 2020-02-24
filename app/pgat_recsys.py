@@ -35,7 +35,7 @@ class PGATRecSys(object):
         """
 
         ratings_df = self.data.ratings[0][['iid', 'movie_count']]
-        ratings_df = ratings_df.drop_duplicates()
+        ratings_df = ratings_df.drop_duplicates(subset=['iid'])
         ratings_df = ratings_df.sort_values(by='movie_count', ascending=False)
 
         return ratings_df[:n]
@@ -71,6 +71,7 @@ class PGATRecSys(object):
 
     def get_recommendations(self):
         # TODO Embedd your adaptation model here
+
         iids = self.get_top_n_popular_items(200).iid
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
         rec_iids = np.random.choice(rec_iids, 20)
@@ -82,6 +83,8 @@ class PGATRecSys(object):
 
         df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
         iids = [iid for iid in df.iid.to_numpy()]
+        import pdb
+        pdb.set_trace()
 
         exp = [self.get_explanation(iid) for iid in iids]
 
