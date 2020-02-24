@@ -98,29 +98,45 @@ def get_movie_poster_withID(i):
 
     movie_url = "http://www.omdbapi.com/?" + "t=" + movie_title + "&y=" + movie_year + "&apikey=" + apikey
     movie_url_no_year = "http://www.omdbapi.com/?" + "t=" + movie_title + "&apikey=" + apikey
-    no_year_exception_flag = 0
     # print('movie_url: ' + movie_url)
+
+    r = requests.get(movie_url)
+    print(r.text)
+    response_text = json.loads(r.text)
     try:
-        r = requests.get(movie_url)
-        movie_info_dic = json.loads(r.text)
+        movie_info_dic = response_text
         poster = movie_info_dic['Poster']
         if poster == 'N/A':
-            no_year_exception_flag = 1
+            return default_poster_src
         else:
             return poster
+
     except:
-        return default_poster_src
-    if(no_year_exception_flag):
-        try:
+        response_value = response_text['Response']
+        # {"Response": "False", "Error": "Movie not found!"}
+        if response_value == 'False':
             r2 = requests.get(movie_url_no_year)
             movie_info_dic2 = json.loads(r2.text)
-            poster = movie_info_dic2['Poster']
-            if poster == 'N/A':
+            try:
+                poster2 = movie_info_dic2['Poster']
+                if poster2 == 'N/A':
+                    return default_poster_src
+                else:
+                    return poster2
+            except:
                 return default_poster_src
-            else:
-                return poster
-        except:
-            return poster
+
+
+    # except NameError:
+    #     r2 = requests.get(movie_url_no_year)
+    #     movie_info_dic2 = json.loads(r2.text)
+    #     poster2 = movie_info_dic2['Poster']
+    #     if poster2 == 'N/A':
+    #         return default_poster_src
+    #     else:
+    #         return poster2
+    # except:
+    #     return default_poster_src
 
 
 @app.template_global()
