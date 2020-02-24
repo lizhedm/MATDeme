@@ -234,7 +234,6 @@ def movie_degree():
 
     df, exps = recsys.get_recommendations()
     rec_movie_iids = df.iid.values
-    print(rec_movie_iids)
     # print(iids)
     # rec_movie_iids = {209,223,234,253,523,1223,334,438,555,619}
     # exps = {'exp209','exp223','exp234','exp253','exp523','exp1223','exp334','exp438','exp555','exp619'}

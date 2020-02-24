@@ -24,6 +24,8 @@ class PGATRecSys(object):
         self.node_emb = torch.nn.Embedding(self.data.num_nodes[0], model_args['emb_dim'], max_norm=1, norm_type=2.0)
         self.model = PAGATNet(**model_args).to(device_args['device'])
 
+        self.recommended = []
+
     def get_top_n_popular_items(self, n=10):
         """
         Get the top n movies from self.data.ratings.
@@ -35,10 +37,12 @@ class PGATRecSys(object):
         """
 
         ratings_df = self.data.ratings[0][['iid', 'movie_count']]
-        ratings_df = ratings_df.drop_duplicates(subset=['iid'])
         ratings_df = ratings_df.sort_values(by='movie_count', ascending=False)
-
-        return ratings_df[:n]
+        ratings_df = ratings_df.drop_duplicates(subset=['iid'])
+        popular_iids = [iid for iid in ratings_df.iid][:n]
+        item_df = self.data.items[0]
+        popular_item_df = item_df[item_df.iid.isin(popular_iids)]
+        return popular_item_df
 
     def build_user(self, iids, demographic_info):
         """
@@ -73,29 +77,34 @@ class PGATRecSys(object):
         # TODO Embedd your adaptation model here
 
         iids = self.get_top_n_popular_items(200).iid
+        iids = [iid for iid in iids if iid not in self.recommended]
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
-        rec_iids = np.random.choice(rec_iids, 20)
         rec_nids = [self.data.e2nid[0]['iid'][iid] for iid in rec_iids]
         rec_item_emb = self.node_emb.weight[rec_nids]
         est_feedback = torch.sum(self.propagated_new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
-        rec_iid_idx = np.argsort(est_feedback)[:self.num_recs]
-        rec_iids = rec_iids[rec_iid_idx]
+        rec_iid_idx = [i for i in np.argsort(est_feedback)[:self.num_recs]]
+        rec_iids = [rec_iids[idx] for idx in rec_iid_idx]
+        self.recommended += rec_iids
 
-        df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
-        iids = [iid for iid in df.iid.to_numpy()]
-        import pdb
-        pdb.set_trace()
+        exp = [self.get_explanation(iid) for iid in rec_iids]
 
-        exp = [self.get_explanation(iid) for iid in iids]
+        item_df = self.data.items[0]
+        rec_item_df = item_df[item_df.iid.isin(rec_iids)]
 
-        return df, exp
+        return rec_item_df, exp
 
     def get_explanation(self, iid):
         movie_nid = self.data.e2nid[0]['iid'][iid]
         row = [movie_nid, self.new_user_nid]
         col = [self.new_user_nid, movie_nid]
         expl_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
-        exist_edge_index = torch.cat((self.data.edge_index, self.new_edge_index), dim=1)
+        exist_edge_index = torch.cat(
+            (self.data.edge_index,
+             self.new_edge_index,
+             torch.flip(self.new_edge_index, dims=[0])
+             ),
+            dim=1
+        )
         new_path_np = utils.path.join(exist_edge_index, expl_edge_index)
         new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
@@ -104,27 +113,25 @@ class PGATRecSys(object):
 
         e = self.data.nid2e[0][opt_path[0]]
 
-        try:
-            if e[0] == 'uid':
-                expl = 'Uid0--Iid{}--Uid{}'.format(iid, e[1])
-            elif e[0] == 'iid':
-                expl = 'Iid{}--Uid0--Iid{}'.format(
-                    iid,
-                    e[1])
-            elif e[0] == 'gender' or e[0] == 'occ':
-                expl = 'Iid{}--Uid0--DFType{}--DFValue{}'.format(
-                    iid,
-                    e[0],
-                    e[1]
-                )
-            else:
-                expl = 'Uid0--Iid{}--CFType{}--CFValue{}'.format(
-                    iid,
-                    e[0],
-                    e[1]
-                )
-        except:
-            expl = 'error'
+        if e[0] == 'uid':
+            expl = 'Uid0--Iid{}--Uid{}'.format(iid, e[1])
+        elif e[0] == 'iid':
+            expl = 'Iid{}--Uid0--Iid{}'.format(
+                iid,
+                e[1])
+        elif e[0] == 'gender' or e[0] == 'occ':
+            expl = 'Iid{}--Uid0--DFType{}--DFValue{}'.format(
+                iid,
+                e[0],
+                e[1]
+            )
+        else:
+            expl = 'Uid0--Iid{}--CFType{}--CFValue{}'.format(
+                iid,
+                e[0],
+                e[1]
+            )
+
         return expl
 
 
