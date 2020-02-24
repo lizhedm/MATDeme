@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} - User Feedback</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style type="text/css">
+        body, html {
+            margin:0;
+            padding: 0;
+        }
+
+        body {
+            font: 12pt Arial, sans-serif;
+            position: relative;
+            background-color: white;
+        }
+
+        form{
+            margin:0 auto;
+            font-weight:bold;
+        }
+
+        .wrap{
+            padding:5px 0;
+            margin:10px 0;
+        }
+
+        .tip{
+            width:40%;
+            padding-right:20px;
+            float:left;
+            text-align: right;
+        }
+        /* Style the navigation bar links */
+        .navbar a {
+          color: forestgreen;
+          padding: 14px 20px;
+          text-decoration: none;
+          text-align: center;
+        }
+
+        /* Change color on hover */
+        .navbar a:hover {
+          background-color: #ddd;
+          color: black;
+        }
+    </style>
+</head>
+<body>
+        <div class="navbar">
+            <a href="{{ url_for('movie_degree3') }}">Go back</a>
+        </div>
+
+        <form>
+          <div class="wrap">
+          <label class="tip">How often will you watch a movie</label>
+          <input type="radio" name="frequency1" value="0" checked />several days
+          <input type="radio" name="frequency1" value="1"/>once a week
+          <input type="radio" name="frequency1" value="2"/>once a month
+         </div>
+
+          <div class="wrap">
+          <label class="tip">How often will you visit a movie recommendation website</label>
+          <input type="radio" name="frequency2" checked/>several days
+          <input type="radio" name="frequency2" />once a week
+          <input type="radio" name="frequency2" />once a month
+         </div>
+
+           <div class="wrap">
+          <label class="tip">Do you know Recommendation System</label>
+          <input type="radio" name="frequency3" checked/>No
+          <input type="radio" name="frequency3" />a little
+          <input type="radio" name="frequency3" />Yes
+         </div>
+
+            <div class="wrap">
+          <label class="tip">Do you know Explainable Recommendation System</label>
+          <input type="radio" name="frequency4" checked/>No
+          <input type="radio" name="frequency4" />a little
+          <input type="radio" name="frequency4" />Yes
+         </div>
+         
+            <div class="wrap">
+          <label class="tip">How often do you use any Recommend System</label>
+          <input type="radio" name="frequency5" checked/>several days
+          <input type="radio" name="frequency5" />once a week
+          <input type="radio" name="frequency5" />once a month
+         </div>
+
+            <div class="wrap">
+          <label class="tip">How would you describe your overall experience with Recommend System</label>
+          <input type="radio" name="frequency6" checked/>good
+          <input type="radio" name="frequency6" />general feeling
+          <input type="radio" name="frequency6" />not good
+         </div>
+
+            <div class="wrap">
+          <label class="tip">Are you hopeful that our recommendation system will recommend the right movies to you?</label>
+          <input type="radio" name="frequency7" checked/>No
+          <input type="radio" name="frequency7" />a little
+          <input type="radio" name="frequency7" />Yes
+         </div>
+
+        </form>
+
+</body>
+</html>

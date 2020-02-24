@@ -97,18 +97,31 @@ def get_movie_poster_withID(i):
     movie_year = movie_name[-5:-1]
 
     movie_url = "http://www.omdbapi.com/?" + "t=" + movie_title + "&y=" + movie_year + "&apikey=" + apikey
-
+    movie_url_no_year = "http://www.omdbapi.com/?" + "t=" + movie_title + "&apikey=" + apikey
+    no_year_exception_flag = 0
     # print('movie_url: ' + movie_url)
     try:
         r = requests.get(movie_url)
         movie_info_dic = json.loads(r.text)
         poster = movie_info_dic['Poster']
         if poster == 'N/A':
-            return default_poster_src
+            no_year_exception_flag = 1
         else:
             return poster
     except:
         return default_poster_src
+    if(no_year_exception_flag):
+        try:
+            r2 = requests.get(movie_url_no_year)
+            movie_info_dic2 = json.loads(r2.text)
+            poster = movie_info_dic2['Poster']
+            if poster == 'N/A':
+                return default_poster_src
+            else:
+                return poster
+        except:
+            return poster
+
 
 @app.template_global()
 def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,explanation_score,user_study_round):
@@ -306,20 +319,11 @@ def score_movie_transfer3():
     else:
         return 'fail'
 
-@app.route('/recommendation_explanation')
-def recommendation_explanation():
-    return render_template('recommendation_explanation.html',title = 'Film Recommendation')
 
-@app.route('/recommendation_evaluation')
-def recommendation_evaluation():
-    return render_template('recommendation_evaluation.html',title = 'Film Recommendation')
+@app.route('/user_feedback')
+def user_feedback():
+    return render_template('user_feedback.html',title = 'Film Recommendation')
 
-# testInfo = {}
-# @app.route('/imgID_userinfo_post',methods=['GET','POST'])
-# def imgID_userinfo_post():
-#     testInfo['id'] = '456'
-#     testInfo['occupation'] = '2'
-#     return json.dumps(testInfo)
 
 
 

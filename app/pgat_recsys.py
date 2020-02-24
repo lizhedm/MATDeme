@@ -54,14 +54,13 @@ class PGATRecSys(object):
 
         new_user_gender_nid = self.data.e2nid[0]['gender'][demographic_info[0]]
         new_user_occ_nid = self.data.e2nid[0]['occ'][int(demographic_info[1])]
-        row = [self.new_user_nid for i in range(len(iids) + 2)]
-        col = iids + [new_user_gender_nid, new_user_occ_nid]
+        i_nids = [self.data.e2nid[0]['iid'][iid] for iid in iids]
+        row = i_nids + [new_user_gender_nid, new_user_occ_nid]
+        col = [self.new_user_nid for i in range(len(iids) + 2)]
         self.new_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
 
         # Build path begins and ends with
-        path_from_new_user_np = utils.path.join(self.new_edge_index, self.data.edge_index)
-        path_to_new_user_np = np.flip(path_from_new_user_np, axis=0)
-        new_path_np = np.concatenate([path_from_new_user_np, path_to_new_user_np], axis=1)
+        new_path_np = utils.path.join(self.data.edge_index, self.new_edge_index)
         self.new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
 
         # Get new user embedding by applying message passing
@@ -71,7 +70,7 @@ class PGATRecSys(object):
         print('user building done...')
 
     def get_recommendations(self):
-        # Estimate the feedback values and get the recommendation
+        # TODO Embedd your adaptation model here
         iids = self.get_top_n_popular_items(200).iid
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
         rec_iids = np.random.choice(rec_iids, 20)
@@ -90,33 +89,39 @@ class PGATRecSys(object):
 
     def get_explanation(self, iid):
         movie_nid = self.data.e2nid[0]['iid'][iid]
-        row = [self.new_user_nid, movie_nid]
-        col = [movie_nid, self.new_user_nid]
+        row = [movie_nid, self.new_user_nid]
+        col = [self.new_user_nid, movie_nid]
         expl_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
         exist_edge_index = torch.cat((self.data.edge_index, self.new_edge_index), dim=1)
-        path_from_new_user_item_np = utils.path.join(expl_edge_index, exist_edge_index)
-        path_to_new_user_item_np = np.flip(path_from_new_user_item_np, axis=0)
-        new_path_np = np.concatenate([path_from_new_user_item_np, path_to_new_user_item_np], axis=1)
+        new_path_np = utils.path.join(exist_edge_index, expl_edge_index)
         new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
         new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
         att = self.model.forward(new_node_emb, new_path)[1]
         opt_path = new_path[:, torch.argmax(att)].numpy()
-        try:
-            e1 = self.data.nid2e[0][opt_path[0]]
-        except:
-            e1 = ('uid', -1)
+
+        e = self.data.nid2e[0][opt_path[0]]
 
         try:
-            e2 = self.data.nid2e[0][opt_path[1]]
+            if e[0] == 'uid':
+                expl = 'Uid0--Iid{}--Uid{}'.format(iid, e[1])
+            elif e[0] == 'iid':
+                expl = 'Iid{}--Uid0--Iid{}'.format(
+                    iid,
+                    e[1])
+            elif e[0] == 'gender' or e[0] == 'occ':
+                expl = 'Iid{}--Uid0--DFType{}--DFValue{}'.format(
+                    iid,
+                    e[0],
+                    e[1]
+                )
+            else:
+                expl = 'Uid0--Iid{}--CFType{}--CFValue{}'.format(
+                    iid,
+                    e[0],
+                    e[1]
+                )
         except:
-            e2 = ('uid', -1)
-
-        try:
-            e3 = self.data.nid2e[0][opt_path[2]]
-        except:
-            e3 = ('uid', -1)
-
-        expl = e1[0] + str(e1[1]) + '--' + e2[0] + str(e2[1]) + '--' +  e3[0] + str(e3[1])
+            expl = 'error'
         return expl
 
 
