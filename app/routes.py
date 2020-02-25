@@ -158,6 +158,31 @@ def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,exp
     connection.close()
     return 1
 
+@app.template_global()
+def save_question_result1_tosqlite(user_id,question_result1_list):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "MATDemo.db")
+    connection = sqlite3.connect(db_path)
+
+    cursor = connection.cursor()
+    print("Opened database successfully")
+
+    cursor.execute('create table if not exists QUESTION_RESULT1 (user_id,q1,q2,q3,q4,q5,q6,q7)')
+    params = (user_id,
+              question_result1_list[0],
+              question_result1_list[1],
+              question_result1_list[2],
+              question_result1_list[3],
+              question_result1_list[4],
+              question_result1_list[5],
+              question_result1_list[6])
+
+    cursor.execute("INSERT INTO QUESTION_RESULT1 VALUES (?,?,?,?,?,?,?,?)", params)
+    connection.commit()
+    print("Records created successfully")
+
+    connection.close()
+    return 1
 
 @app.route('/')
 @app.route('/index')
@@ -176,6 +201,15 @@ def user_information():
 @app.route('/user_background')
 def user_background():
     return render_template('user_background.html',title = 'Film Recommendation')
+
+@app.route('/question_result_transfer',methods=['GET','POST'])
+def question_result_transfer():
+    if request.method == 'POST':
+        user_id = request.values['user_id']
+        question_result_list = request.values['question_result_list']
+        if question_result_list != '':
+            save_question_result1_tosqlite(user_id,question_result_list)
+            return 'success'
 
 @app.route('/movie_preview')
 def movie_preview():
@@ -217,10 +251,6 @@ def imgID_userinfo_transfer():
         return 'success'
     else:
         return 'fail'
-
-@app.route('/new_iids_for_recommendations',methods=['GET','POST'])
-def new_iids_for_recommendations():
-    pass
 
 
 @app.route('/movie_degree')
