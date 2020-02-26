@@ -28,7 +28,8 @@ class PAGAT(torch.nn.Module):
         self.conv1.reset_parameters()
         self.conv2.reset_parameters()
 
-    def forward(self, x, path_index):
+    def forward(self, data):
+        x, path_index = data.x, data.path_index
         if self.training:
             path_num = path_index.shape[1]
             path_index = path_index[:, np.random.choice(range(path_num), int(path_num * (1 - self.path_dropout)))]
