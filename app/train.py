@@ -3,7 +3,7 @@ import torch
 
 from .utils import get_folder_path
 
-__model__ = 'PGAT'
+__model__ = 'PAGAT'
 
 parser = argparse.ArgumentParser()
 
@@ -21,10 +21,9 @@ parser.add_argument("--emb_dim", type=int, default=64, help="")
 parser.add_argument("--repr_dim", type=int, default=16, help="")
 
 # Train params
-parser.add_argument("--device", type=str, default='cuda', help="")
+parser.add_argument("--device", type=str, default='cpu', help="")
 parser.add_argument("--gpu_idx", type=str, default='0', help="")
-parser.add_argument("--runs", type=int, default=10, help="")
-parser.add_argument("--epochs", type=int, default=50, help="")
+parser.add_argument("--epochs", type=int, default=1000, help="")
 parser.add_argument("--opt", type=str, default='adam', help="")
 parser.add_argument("--loss", type=str, default='mse', help="")
 parser.add_argument("--batch_size", type=int, default=256, help="")
