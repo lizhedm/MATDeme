@@ -43,6 +43,11 @@ iid_list = []
 iid_list2 = []
 iid_list3 = []
 demographic_info = ()
+rs_proportion = {'IUI':4,
+                 'UIU':3,
+                 'IUDD':2,
+                 'UICC':1,
+                 'SUM':10}
 
 ########################## Define arguments ##########################
 data_folder, weights_folder, logger_folder = get_folder_path(args.dataset + args.dataset_name)
@@ -127,16 +132,11 @@ def get_movie_poster_withID(i):
                 return default_poster_src
 
 
-    # except NameError:
-    #     r2 = requests.get(movie_url_no_year)
-    #     movie_info_dic2 = json.loads(r2.text)
-    #     poster2 = movie_info_dic2['Poster']
-    #     if poster2 == 'N/A':
-    #         return default_poster_src
-    #     else:
-    #         return poster2
-    # except:
-    #     return default_poster_src
+@app.template_global()
+def run_adaptation_model(rs_proportion):
+    # create new proportion
+    new_rs_proportion = rs_proportion;
+    return new_rs_proportion
 
 
 @app.template_global()
@@ -291,7 +291,7 @@ def movie_degree():
     recsys.build_user(iid_list, demographic_info)
     print('new user created')
 
-    df, exps = recsys.get_recommendations()
+    df, exps = recsys.get_recommendations(rs_proportion)
     rec_movie_iids = df.iid.values
     # print(iids)
     # rec_movie_iids = {209,223,234,253,523,1223,334,438,555,619}
@@ -315,7 +315,13 @@ def score_movie_transfer():
         explanation = request.values['explanation']
         score = request.values['score']
         user_study_round = "1"
+        # save 10 {explanation_type:score}
+        # run Adaptation Model to get new Explanation proportion
+        # like {IUI:UIU:IUDD:UICC} = {1:2:3:4} sum=10
         print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+
+
+        # rs_proportion[explanation] += 1;
 
         save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
 
@@ -336,8 +342,11 @@ def movie_degree2():
     global iid_list2
     global demographic_info
     new_iids = recsys.base_iids + iid_list2
+    # how to know the explanation type of iid in iid_list2
+    # TODO:Send Adaptation Model parameter to build user in next round
+    new_rs_proportion = run_adaptation_model(rs_proportion)
     recsys.build_user(new_iids, demographic_info)
-    df, exps = recsys.get_recommendations()
+    df, exps = recsys.get_recommendations(new_rs_proportion)
     rec_movie_iids2 = df.iid.values
     return render_template('movie_degree2.html',title = 'Film Recommendation',rec_movie_iids_and_explanations2 = zip(rec_movie_iids2,exps))
 

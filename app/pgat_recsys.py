@@ -73,8 +73,7 @@ class PGATRecSys(object):
         self.propagated_new_user_emb= self.model.forward(new_node_emb, self.new_path)[0][-1, :]
         print('user building done...')
 
-    def get_recommendations(self):
-        # TODO Embedd your adaptation model here
+    def get_recommendations(self,rs_proportion):
 
         iids = self.get_top_n_popular_items(200).iid
         iids = [iid for iid in iids if iid not in self.recommended]
@@ -82,16 +81,38 @@ class PGATRecSys(object):
         rec_nids = [self.data.e2nid[0]['iid'][iid] for iid in rec_iids]
         rec_item_emb = self.node_emb.weight[rec_nids]
         est_feedback = torch.sum(self.propagated_new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
-        rec_iid_idx = [i for i in np.argsort(est_feedback)[:self.num_recs]]
+        rec_iid_idx = [i for i in np.argsort(est_feedback)]
+        # [:self.num_recs]
+        import pdb
+        pdb.set_trace()
         rec_iids = [rec_iids[idx] for idx in rec_iid_idx]
-        self.recommended += rec_iids
+        # how to know what is the explanation type of rec_iids
+
 
         exp = [self.get_explanation(iid) for iid in rec_iids]
+        exp, expl_types = [_[0] for _ in exp], [_[1] for _ in exp]
+
+        iui_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][:rs_proportion['IUI']]
+        iui_rec_iids = [rec_iids[idx] for idx in iui_rec_index]
+        iui_rec_exp = []
+
+        uiu_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'UIU'][:rs_proportion['UIU']]
+        uiu_rec_iids = [rec_iids[idx] for idx in uiu_rec_index]
+
+        iudd_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUDD'][:rs_proportion['IUDD']]
+        iudd_rec_iids = [rec_iids[idx] for idx in iudd_rec_index]
+
+        uicc_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'UICC'][:rs_proportion['UICC']]
+        uicc_rec_iids = [rec_iids[idx] for idx in uicc_rec_index]
+
+        final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
+        self.recommended += final_rec_iids
 
         item_df = self.data.items[0]
-        rec_item_df = item_df[item_df.iid.isin(rec_iids)]
+        rec_item_df = item_df[item_df.iid.isin(final_rec_iids)]
+        final_exp = [self.get_explanation(iid)[0] for iid in final_rec_iids]
 
-        return rec_item_df, exp
+        return rec_item_df, final_exp
 
     def get_explanation(self, iid):
         movie_nid = self.data.e2nid[0]['iid'][iid]
@@ -115,24 +136,28 @@ class PGATRecSys(object):
 
         if e[0] == 'uid':
             expl = 'Uid0--Iid{}--Uid{}'.format(iid, e[1])
+            expl_type = 'UIU'
         elif e[0] == 'iid':
             expl = 'Iid{}--Uid0--Iid{}'.format(
                 iid,
                 e[1])
+            expl_type = 'IUI'
         elif e[0] == 'gender' or e[0] == 'occ':
             expl = 'Iid{}--Uid0--DFType{}--DFValue{}'.format(
                 iid,
                 e[0],
                 e[1]
             )
+            expl_type = 'IUDD'
         else:
             expl = 'Uid0--Iid{}--CFType{}--CFValue{}'.format(
                 iid,
                 e[0],
                 e[1]
             )
+            expl_type = 'UICC'
 
-        return expl
+        return expl, expl_type
 
 
 if __name__ == '__main__':
