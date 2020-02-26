@@ -143,6 +143,7 @@
     <script type="text/javascript">
 
         $.ajaxSetup({async: false});
+        var explanation_type_list = ['','','','','','','','','',''];
 {#        set image selected function#}
         function select(element) {
           element.onclick = function() {
@@ -152,6 +153,7 @@
         Array.from(document.getElementsByClassName('poster-img')).forEach(select);
 
 {#        reset explanation function#}
+        var loop_index1 = 0;
         function reset_explanation_text(element){
             var original_text = element.innerHTML;
             var upper_text = '';
@@ -167,6 +169,8 @@
             }
 {#            alert('upper_text:'+upper_text);#}
 
+            explanation_type_list[loop_index1] = upper_text;
+            loop_index1 = loop_index1 + 1;
             if(upper_text === 'UIU'){
 {#                user-based recommendation#}
 {#                (uid_x) is recommended with (iid_a) because (uid_y) is similar with (uid_x) and (uid_y) likes (iid_a)#}
@@ -299,6 +303,7 @@
         }
         Array.from($(".explanation")).forEach(reset_explanation_text);
 
+        var loop_index2 = 0;
         $('.star-raty').raty({
             starOff:'https://image.flaticon.com/icons/png/128/149/149222.png',
             starOn:'https://image.flaticon.com/icons/png/128/148/148841.png',
@@ -313,9 +318,11 @@
                     }
                 }
 
-                var explanation = 'exp';
-                var data = {'user_id':sessionStorage.user_id,'movie_id':this.id,'seen_status':seen_status,'explanation':explanation,'score':score}
-{#                alert('user_id'+sessionStorage.user_id+'movie_id'+this.id+'seen_status'+seen_status+'explanation'+explanation+'score'+score);#}
+                var explanation_type = explanation_type_list[loop_index2];
+                loop_index2 = loop_index2 + 1;
+
+                var data = {'user_id':sessionStorage.user_id,'movie_id':this.id,'seen_status':seen_status,'explanation_type':explanation_type,'score':score}
+{#                alert('user_id'+sessionStorage.user_id+'movie_id'+this.id+'seen_status'+seen_status+'explanation_type'+explanation_type+'score'+score);#}
                 $.post('{{ url_for('score_movie_transfer2') }}',data,function (response){
                     if(response){}
                 });

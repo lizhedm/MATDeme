@@ -39,14 +39,15 @@ parser.add_argument("--gpu_idx", type=str, default='0', help="")
 args = parser.parse_args()
 
 # save id selected by users
+current_user_id = ''
 iid_list = []
 iid_list2 = []
 iid_list3 = []
 demographic_info = ()
-rs_proportion = {'IUI':4,
+rs_proportion = {'IUI':3,
                  'UIU':3,
                  'IUDD':2,
-                 'UICC':1,
+                 'UICC':2,
                  'SUM':10}
 
 ########################## Define arguments ##########################
@@ -133,14 +134,76 @@ def get_movie_poster_withID(i):
 
 
 @app.template_global()
-def run_adaptation_model(rs_proportion):
+def run_adaptation_model(user_id,proportion,round_number):
+    # get type and score data from sqlite3 database
+    explanation_type_and_score_list = select_explanation_type_and_score(user_id,round_number)
+
+    # calculate average score
+    average_score_of_sum = sum([int(type_score[1]) for type_score in explanation_type_and_score_list]) / len(explanation_type_and_score_list)
+
+    iui_score_list = [int(type_score[1]) for type_score in explanation_type_and_score_list if type_score[0] == 'IUI']
+    if len(iui_score_list) != 0:
+        average_score_of_iui = sum(iui_score_list)/len(iui_score_list)
+    else:
+        # if this exp type did not appear in previous round,
+        # add one in next round to test whether user may like it
+        average_score_of_iui = average_score_of_sum + 1
+
+    uiu_score_list = [int(type_score[1]) for type_score in explanation_type_and_score_list if type_score[0] == 'UIU']
+    if len(uiu_score_list) != 0:
+        average_score_of_uiu = sum(uiu_score_list) / len(uiu_score_list)
+    else:
+        average_score_of_uiu = average_score_of_sum + 1
+
+    iudd_score_list = [int(type_score[1]) for type_score in explanation_type_and_score_list if type_score[0] == 'IUDD']
+    if len(iudd_score_list) != 0:
+        average_score_of_iudd = sum(iudd_score_list) / len(iudd_score_list)
+    else:
+        average_score_of_iudd = average_score_of_sum + 1
+
+    uicc_score_list = [int(type_score[1]) for type_score in explanation_type_and_score_list if type_score[0] == 'UICC']
+    if len(uicc_score_list) != 0:
+        average_score_of_uicc = sum(uicc_score_list) / len(uicc_score_list)
+    else:
+        average_score_of_uicc = average_score_of_sum + 1
+
+    # Adaptation Model
     # create new proportion
-    new_rs_proportion = rs_proportion;
+    new_rs_proportion = {'IUI': proportion['IUI'] + round(average_score_of_iui - average_score_of_sum),
+                         'UIU': proportion['UIU'] + round(average_score_of_uiu - average_score_of_sum),
+                         'IUDD': proportion['IUDD'] + round(average_score_of_iudd - average_score_of_sum),
+                         'UICC': proportion['UICC'] + round(average_score_of_uicc - average_score_of_sum), 'SUM': 10}
+    if new_rs_proportion['IUI'] < 0:
+        new_rs_proportion['IUI'] = 0
+    if new_rs_proportion['IUI'] > 10:
+        new_rs_proportion['IUI'] = 10
+
+    if new_rs_proportion['UIU'] < 0:
+        new_rs_proportion['UIU'] = 0
+    if new_rs_proportion['UIU'] > 10:
+        new_rs_proportion['UIU'] = 10
+
+    if new_rs_proportion['IUDD'] < 0:
+        new_rs_proportion['IUDD'] = 0
+    if new_rs_proportion['IUDD'] > 10:
+        new_rs_proportion['IUDD'] = 10
+
+    if new_rs_proportion['UICC'] < 0:
+        new_rs_proportion['UICC'] = 0
+    if new_rs_proportion['UICC'] > 10:
+        new_rs_proportion['UICC'] = 10
+
+    while new_rs_proportion['IUI'] + new_rs_proportion['UIU'] + new_rs_proportion['IUDD'] + new_rs_proportion['UICC'] > new_rs_proportion['SUM']:
+        new_rs_proportion['IUI'] -= 1
+
+    while new_rs_proportion['IUI'] + new_rs_proportion['UIU'] + new_rs_proportion['IUDD'] + new_rs_proportion['UICC'] < new_rs_proportion['SUM']:
+        new_rs_proportion['IUI'] += 1
+
     return new_rs_proportion
 
 
 @app.template_global()
-def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,explanation_score,user_study_round):
+def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation_type,explanation_score,user_study_round):
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     db_path = os.path.join(BASE_DIR, "MATDemo.db")
     connection = sqlite3.connect(db_path)
@@ -148,8 +211,8 @@ def save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,exp
     cursor = connection.cursor()
     print("Opened database successfully")
 
-    cursor.execute('create table if not exists EXP_SCORE (user_id,movie_id,seen_status,explanation,explanation_score,user_study_round)')
-    params = (user_id,movie_id,seen_status,explanation,explanation_score,user_study_round)
+    cursor.execute('create table if not exists EXP_SCORE (user_id,movie_id,seen_status,explanation_type,explanation_score,user_study_round)')
+    params = (user_id,movie_id,seen_status,explanation_type,explanation_score,user_study_round)
 
     cursor.execute("INSERT INTO EXP_SCORE VALUES (?,?,?,?,?,?)",params)
     connection.commit()
@@ -213,6 +276,31 @@ def save_question_result2_tosqlite(user_id,question_result2_list):
     connection.close()
     return 1
 
+@app.template_global()
+def select_explanation_type_and_score(user_id,round_number):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, "MATDemo.db")
+    connection = sqlite3.connect(db_path)
+
+    cursor = connection.cursor()
+    print("Opened database successfully")
+
+    # import pdb
+    # pdb.set_trace()
+
+    params = (str(user_id),str(round_number))
+    cursor.execute("SELECT explanation_type, explanation_score FROM EXP_SCORE WHERE user_id=? AND user_study_round=?",params)
+
+    explanation_type_score_rows = cursor.fetchall()
+
+    # for row in rows:
+    #     print(row)
+
+    connection.commit()
+    print("Select data successfully")
+
+    return explanation_type_score_rows;
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -235,6 +323,8 @@ def user_background():
 def question_result_transfer():
     if request.method == 'POST':
         user_id = request.values['user_id']
+        global current_user_id
+        current_user_id = user_id
         question_result_list = request.values['question_result_list']
         if question_result_list != '':
             save_question_result1_tosqlite(user_id,question_result_list)
@@ -284,18 +374,17 @@ def imgID_userinfo_transfer():
 
 @app.route('/movie_degree')
 def movie_degree():
-    # import pdb
-    # pdb.set_trace()
+
     global iid_list
     global demographic_info
+    global rs_proportion
+
     recsys.build_user(iid_list, demographic_info)
     print('new user created')
 
     df, exps = recsys.get_recommendations(rs_proportion)
     rec_movie_iids = df.iid.values
-    # print(iids)
-    # rec_movie_iids = {209,223,234,253,523,1223,334,438,555,619}
-    # exps = {'exp209','exp223','exp234','exp253','exp523','exp1223','exp334','exp438','exp555','exp619'}
+
     return render_template('movie_degree.html',title = 'Film Recommendation',rec_movie_iids_and_explanations = zip(rec_movie_iids,exps))
 
 @app.route('/movie_name_transfer',methods=['GET','POST'])
@@ -312,18 +401,18 @@ def score_movie_transfer():
         user_id = request.values['user_id']
         movie_id = request.values['movie_id']
         seen_status = request.values['seen_status']
-        explanation = request.values['explanation']
+        explanation_type = request.values['explanation_type']
         score = request.values['score']
         user_study_round = "1"
         # save 10 {explanation_type:score}
         # run Adaptation Model to get new Explanation proportion
         # like {IUI:UIU:IUDD:UICC} = {1:2:3:4} sum=10
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation_type:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation_type,score,user_study_round))
 
 
         # rs_proportion[explanation] += 1;
 
-        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation_type,score,user_study_round)
 
         the_id = int(movie_id)
         the_score = int(score)
@@ -338,16 +427,23 @@ def score_movie_transfer():
 @app.route('/movie_degree2')
 def movie_degree2():
 
-    # print(iid_list2)
     global iid_list2
     global demographic_info
     new_iids = recsys.base_iids + iid_list2
-    # how to know the explanation type of iid in iid_list2
+
     # TODO:Send Adaptation Model parameter to build user in next round
-    new_rs_proportion = run_adaptation_model(rs_proportion)
+    global current_user_id
+    global rs_proportion
+
+    new_rs_proportion = run_adaptation_model(current_user_id,rs_proportion,1)
+
     recsys.build_user(new_iids, demographic_info)
     df, exps = recsys.get_recommendations(new_rs_proportion)
     rec_movie_iids2 = df.iid.values
+
+    # save new_rs_proportion to rs_proportion for next round
+    rs_proportion = new_rs_proportion
+
     return render_template('movie_degree2.html',title = 'Film Recommendation',rec_movie_iids_and_explanations2 = zip(rec_movie_iids2,exps))
 
 @app.route('/score_movie_transfer2',methods=['GET','POST'])
@@ -357,12 +453,12 @@ def score_movie_transfer2():
         user_id = request.values['user_id']
         movie_id = request.values['movie_id']
         seen_status = request.values['seen_status']
-        explanation = request.values['explanation']
+        explanation_type = request.values['explanation_type']
         score = request.values['score']
         user_study_round = "2"
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation_type:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation_type,score,user_study_round))
 
-        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation_type,score,user_study_round)
 
         the_id = int(movie_id)
         the_score = int(score)
@@ -380,9 +476,19 @@ def movie_degree3():
     global iid_list3
     global demographic_info
     new_iids = recsys.base_iids + iid_list3
+
+    global current_user_id
+    global rs_proportion
+
+    new_rs_proportion = run_adaptation_model(current_user_id,rs_proportion,2)
+
     recsys.build_user(new_iids, demographic_info)
-    df, exps = recsys.get_recommendations()
+    df, exps = recsys.get_recommendations(new_rs_proportion)
     rec_movie_iids3 = df.iid.values
+
+    # save new_rs_proportion to rs_proportion for next round
+
+    rs_proportion = new_rs_proportion
 
     return render_template('movie_degree3.html',title = 'Film Recommendation',rec_movie_iids_and_explanations3 = zip(rec_movie_iids3,exps))
 
@@ -392,12 +498,12 @@ def score_movie_transfer3():
         user_id = request.values['user_id']
         movie_id = request.values['movie_id']
         seen_status = request.values['seen_status']
-        explanation = request.values['explanation']
+        explanation_type = request.values['explanation_type']
         score = request.values['score']
         user_study_round = "3"
-        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation,score,user_study_round))
+        print('get new data, user_id:{},movie_id:{},seen_status:{},explanation_type:{},score:{},user_study_round:{}'.format(user_id,movie_id,seen_status,explanation_type,score,user_study_round))
 
-        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation,score,user_study_round)
+        save_explanation_score_tosqlite(user_id,movie_id,seen_status,explanation_type,score,user_study_round)
 
         return 'success'
     else:

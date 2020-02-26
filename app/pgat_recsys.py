@@ -83,8 +83,7 @@ class PGATRecSys(object):
         est_feedback = torch.sum(self.propagated_new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
         rec_iid_idx = [i for i in np.argsort(est_feedback)]
         # [:self.num_recs]
-        import pdb
-        pdb.set_trace()
+
         rec_iids = [rec_iids[idx] for idx in rec_iid_idx]
         # how to know what is the explanation type of rec_iids
 
@@ -94,23 +93,28 @@ class PGATRecSys(object):
 
         iui_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][:rs_proportion['IUI']]
         iui_rec_iids = [rec_iids[idx] for idx in iui_rec_index]
-        iui_rec_exp = []
+        iui_rec_exp = [exp[idx] for idx in iui_rec_index]
 
         uiu_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'UIU'][:rs_proportion['UIU']]
         uiu_rec_iids = [rec_iids[idx] for idx in uiu_rec_index]
+        uiu_rec_exp = [exp[idx] for idx in uiu_rec_index]
 
         iudd_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUDD'][:rs_proportion['IUDD']]
         iudd_rec_iids = [rec_iids[idx] for idx in iudd_rec_index]
+        iudd_rec_exp = [exp[idx] for idx in iudd_rec_index]
 
         uicc_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'UICC'][:rs_proportion['UICC']]
         uicc_rec_iids = [rec_iids[idx] for idx in uicc_rec_index]
+        uicc_rec_exp = [exp[idx] for idx in uicc_rec_index]
 
         final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
         self.recommended += final_rec_iids
 
         item_df = self.data.items[0]
         rec_item_df = item_df[item_df.iid.isin(final_rec_iids)]
-        final_exp = [self.get_explanation(iid)[0] for iid in final_rec_iids]
+        final_exp = iui_rec_exp + uiu_rec_exp + iudd_rec_exp + uicc_rec_exp
+        # import pdb
+        # pdb.set_trace()
 
         return rec_item_df, final_exp
 
