@@ -73,6 +73,7 @@ class PGATRecSys(object):
 
     def get_recommendations(self, seen_iids):
         # Estimate the feedback values and get the recommendation
+<<<<<<< Updated upstream
         iids = self.get_top_n_popular_items(200).iid
         rec_iids = [iid for iid in iids if iid not in seen_iids]
         rec_iids = np.random.choice(rec_iids, 20)
@@ -84,6 +85,24 @@ class PGATRecSys(object):
 
         df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
         iids = [iid for iid in df.iids.value]
+=======
+        try:
+            iids = self.get_top_n_popular_items(200).iid
+            rec_iids = [iid for iid in iids if iid not in seen_iids]
+            rec_iids = np.random.choice(rec_iids, 20)
+            rec_nids = self.data.items[0].iloc[rec_iids].nid.values
+
+            rec_item_emb = self.node_emb[rec_nids]
+
+            est_feedback = torch.sum(self.new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
+            rec_iid_idx = np.argsort(est_feedback)[:self.num_recs]
+            rec_iids = rec_iids[rec_iid_idx]
+
+            df = self.data.items[0][self.data.items[0].iid.isin(rec_iids)]
+        except:
+            import pdb
+            pdb.set_trace()
+>>>>>>> Stashed changes
 
         exp = [self.get_explanation(iid) for iid in iids]
 
