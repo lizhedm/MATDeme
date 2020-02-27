@@ -7,8 +7,8 @@ import time
 import numpy as np
 
 from utils import get_folder_path
-from pgat import PAGAT
-from .eval_rec_sys import metrics
+from pagat import PAGAT
+from eval_rec_sys import metrics
 parser = argparse.ArgumentParser()
 
 # Dataset params
@@ -21,8 +21,8 @@ parser.add_argument("--debug", default=0.01, help="")
 
 # Model params
 parser.add_argument("--heads", type=int, default=4, help="")
-parser.add_argument("--emb_dim", type=int, default=64, help="")
-parser.add_argument("--repr_dim", type=int, default=16, help="")
+parser.add_argument("--emb_dim", type=int, default=16, help="")
+parser.add_argument("--repr_dim", type=int, default=8, help="")
 parser.add_argument("--hidden_size", type=int, default=64, help="")
 
 # Train params
@@ -31,7 +31,7 @@ parser.add_argument("--gpu_idx", type=str, default='0', help="")
 parser.add_argument("--epochs", type=int, default=1000, help="")
 parser.add_argument("--opt", type=str, default='adam', help="")
 parser.add_argument("--loss", type=str, default='mse', help="")
-parser.add_argument("--batch_size", type=int, default=256, help="")
+parser.add_argument("--batch_size", type=int, default=16, help="")
 parser.add_argument("--lr", type=float, default=1e-4, help="")
 parser.add_argument("--weight_decay", type=float, default=0, help="")
 parser.add_argument("--early_stopping", type=int, default=40, help="")
@@ -78,8 +78,8 @@ print('rec params: {}'.format(rec_args))
 
 if __name__ == '__main__':
     dataset = MovieLens(**dataset_args)
-    dataset.data = dataset.data.to(device)
-    model = PAGAT(**model_args).to(train_args['device'])
+    dataset.data = dataset.data.to(train_args['device'])
+    model = PAGAT(num_nodes=dataset.data.num_nodes[0], **model_args).to(train_args['device'])
     optimizer = Adam(model.parameters(), lr=train_args['lr'], weight_decay=train_args['weight_decay'])
     if torch.cuda.is_available():
         torch.cuda.synchronize()
@@ -96,8 +96,11 @@ if __name__ == '__main__':
 
         model.train()
         for user_pos_neg_pair_batch in data_loader:
-            propagated_node_emb = model(data)
-            u_nid, pos_i_nid, neg_i_nid = user_pos_neg_pair_batch
+            u_nid, pos_i_nid, neg_i_nid = user_pos_neg_pair_batch.T
+            occ_nid = np.concatenate((u_nid, pos_i_nid, neg_i_nid))
+            path_index_batch = torch.from_numpy(data.path_np[0][:, np.isin(data.path_np[0][-1, :], occ_nid)]).to(train_args['device'])
+            propagated_node_emb = model(path_index_batch)
+
             u_nid, pos_i_nid, neg_i_nid = u_nid.to(device), pos_i_nid.to(device), neg_i_nid.to(device)
             u_node_emb, pos_i_node_emb, neg_i_node_emb = propagated_node_emb[u_nid], propagated_node_emb[pos_i_nid], propagated_node_emb[neg_i_nid]
             pred_pos = (u_node_emb * pos_i_node_emb).sum(dim=1)
