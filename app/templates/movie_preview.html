@@ -98,7 +98,7 @@
 <body>
 
     <!-- Navigation Bar -->
-    <div class="navbar">
+    <div class="navbar" align="center">
         <a href="{{ url_for('user_background') }}">Go back</a>
         <a id="refresh">Refresh</a>
 {#        <a href="{{ url_for('movie_preview') }}">Refresh</a>#}
@@ -175,7 +175,7 @@
                     window.location.href = "{{ url_for('movie_degree') }}";
     {#                alert('You have finished the task,10 movies have been choosed!');#}
                 }
-                var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'occupation':sessionStorage.occupation_value};
+                var data = {'id':this.id, 'gender':sessionStorage.gender_value, 'age':sessionStorage.user_age , 'occupation':sessionStorage.occupation_value};
     {#            var URL = 'imgID_userinfo_transfer';#}
                 $.post(URL,data,function (response){
     {#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}

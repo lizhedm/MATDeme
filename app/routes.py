@@ -362,6 +362,7 @@ def imgID_userinfo_transfer():
         the_id = int(the_id)
         gender = request.values['gender']
         occupation = request.values['occupation']
+        # user_age = request.values['user_age']
 
         demographic_info = (gender, occupation)
         iid_list.append(the_id)
@@ -416,9 +417,7 @@ def score_movie_transfer():
 
         the_id = int(movie_id)
         the_score = int(score)
-        if the_score >= 3 :
-            # build new iid list with ids which score >= 3
-            iid_list2.append(the_id)
+        iid_list2.append(the_id)
 
         return 'success'
     else:
@@ -441,6 +440,7 @@ def movie_degree2():
     df, exps = recsys.get_recommendations(new_rs_proportion)
     rec_movie_iids2 = df.iid.values
 
+
     # save new_rs_proportion to rs_proportion for next round
     rs_proportion = new_rs_proportion
 
@@ -462,9 +462,7 @@ def score_movie_transfer2():
 
         the_id = int(movie_id)
         the_score = int(score)
-        if the_score >= 3 :
-            # build new iid list with ids which score >= 3
-            iid_list3.append(the_id)
+        iid_list3.append(the_id)
 
         return 'success'
     else:

@@ -46,11 +46,51 @@
           background-color: #ddd;
           color: black;
         }
+
+        input{
+            padding-right: 30px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            background-color: #fff;
+            background-image: none;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            box-sizing: border-box;
+            color: #606266;
+            display: inline-block;
+            font-size: inherit;
+            height: 30px;
+            line-height: 40px;
+            outline: none;
+            padding: 0 15px;
+            transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+            font-family: inherit;
+        }
+
+        select{
+            cursor: pointer;
+            -webkit-appearance: none;
+            background-color: #fff;
+            background-image: none;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            box-sizing: border-box;
+            color: #606266;
+            display: inline-block;
+            font-size: inherit;
+            height: 30px;
+            line-height: 30px;
+            outline: none;
+            padding: 0 15px;
+            transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+            font-family: inherit;
+        }
+
     </style>
 
 </head>
 <body onload = 'initDefaultValue()'>
-        <div class="navbar">
+        <div class="navbar" align="center">
             <a href="{{ url_for('explanation') }}">Go back</a>
             <a id="user_background" >Next</a>
         </div>
@@ -74,7 +114,7 @@
 
         <form>
           <div class="wrap">
-          <label class="tip">Age</label>
+          <label class="tip">Age: </label>
           <select id="age">
               <option value="0" selected="selected">0~18</option>
               <option value="1">18~24</option>
@@ -89,7 +129,7 @@
 
         <form>
           <div class="wrap">
-          <label class="tip">Occupation</label>
+          <label class="tip">Occupation:</label>
           <select id="occupation">
               <option value="0" selected="selected">Other</option>
               <option value="1">academic/educator</option>
@@ -137,18 +177,6 @@
                 }
             });
 
-            $("#occupation").change(function () {
-{#                alert(this.value);#}
-                if(typeof(Storage) !== "undefined") {
-
-                    sessionStorage.occupation_value = this.value;
-
-                } else {
-                    alert("Not support web storage");
-                }
-{#                alert(sessionStorage.occupation_value);#}
-            });
-
             $("#gender").change(function () {
 {#                alert(this.value);#}
                 if(typeof(Storage) !== "undefined") {
@@ -158,6 +186,30 @@
                 } else {
                     alert("Not support web storage");
                 }
+            });
+
+            $("#age").change(function () {
+{#                alert(this.value);#}
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.user_age = this.value;
+
+                } else {
+                    alert("Not support web storage");
+                }
+{#                alert(sessionStorage.occupation_value);#}
+            });
+
+             $("#occupation").change(function () {
+{#                alert(this.value);#}
+                if(typeof(Storage) !== "undefined") {
+
+                    sessionStorage.occupation_value = this.value;
+
+                } else {
+                    alert("Not support web storage");
+                }
+{#                alert(sessionStorage.occupation_value);#}
             });
 
             $("#user_background").on('click',function () {

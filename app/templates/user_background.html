@@ -23,14 +23,13 @@
 
         .wrap{
             padding:5px 0;
-            margin:10px 0;
+            margin:20px 0;
         }
 
         .tip{
-            width:40%;
-            padding-right:20px;
+            padding-left:20px;
             float:left;
-            text-align: right;
+            text-align: left;
         }
         /* Style the navigation bar links */
         .navbar a {
@@ -45,16 +44,89 @@
           background-color: #ddd;
           color: black;
         }
+
+        input[type=checkbox], input[type=radio] {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 13px;
+              height: 13px;
+              margin: 0;
+              cursor: pointer;
+              vertical-align: bottom;
+              background: #fff;
+              border: 1px solid #dcdcdc;
+              -webkit-border-radius: 1px;
+              -moz-border-radius: 1px;
+              border-radius: 1px;
+              -webkit-box-sizing: border-box;
+              -moz-box-sizing: border-box;
+              box-sizing: border-box;
+              position: relative;
+        }
+
+        input[type=checkbox]:active,
+          input[type=radio]:active {
+          border-color: #c6c6c6;
+          background: #ebebeb;
+        }
+
+        input[type=checkbox]:hover {
+          border-color: #c6c6c6;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+          -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        input[type=radio] {
+          -webkit-border-radius: 1em;
+          -moz-border-radius: 1em;
+          border-radius: 1em;
+          width: 15px;
+          height: 15px;
+        }
+
+        input[type=checkbox]:checked,
+          input[type=radio]:checked {
+          background: #fff;
+        }
+
+        input[type=radio]:checked::after {
+          content: '';
+          display: block;
+          position: relative;
+          top: 3px;
+          left: 3px;
+          width: 7px;
+          height: 7px;
+          background:forestgreen;
+          -webkit-border-radius: 1em;
+          -moz-border-radius: 1em;
+          border-radius: 1em;
+        }
+
+        input[type=checkbox]:checked::after {
+          content: url(//ssl.gstatic.com/ui/v1/menu/checkmark.png);
+          display: block;
+          position: absolute;
+          top: -6px;
+          left: -5px;
+        }
+
+        input[type=checkbox]:focus {
+          outline: none;
+          border-color:#4d90fe;
+        }
+
     </style>
 </head>
 <body>
 
-        <div class="navbar">
+        <div class="navbar" align="center">
             <a href="{{ url_for('user_information') }}">Go back</a>
             <a id="next" >Next</a>
         </div>
 
-        <form id="question1" class="question">
+        <form id="question1" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often will you watch a movie</label>
               <input type="radio" name="question1" value="1"/>several days
@@ -63,7 +135,9 @@
             </div>
         </form>
 
-        <form id="question2" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question2" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often will you visit a movie recommendation website</label>
               <input type="radio" name="question2" value="1"/>several days
@@ -71,8 +145,10 @@
               <input type="radio" name="question2" value="3"/>once a month
             </div>
         </form>
-         
-        <form id="question3" class="question">
+
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question3" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you know Recommendation System</label>
               <input type="radio" name="question3" value="1"/>No
@@ -81,7 +157,9 @@
             </div>
         </form>
 
-        <form id="question4" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question4" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you know Explainable Recommendation System</label>
               <input type="radio" name="question4" value="1"/>No
@@ -90,7 +168,9 @@
             </div>
         </form>
 
-        <form id="question5" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question5" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often do you use any Recommend System</label>
               <input type="radio" name="question5" value="1"/>several days
@@ -99,7 +179,9 @@
             </div>
         </form>
 
-         <form id="question6" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+         <form id="question6" class="question" align="right">
             <div class="wrap">
               <label class="tip">How would you describe your overall experience with Recommend System</label>
               <input type="radio" name="question6" value="1"/>not good
@@ -108,7 +190,9 @@
             </div>
         </form>
 
-        <form id="question7" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question7" class="question" align="right">
             <div class="wrap">
               <label class="tip">Are you hopeful that our recommendation system will recommend the right movies to you?</label>
               <input type="radio" name="question7" value="1"/>No
@@ -116,6 +200,8 @@
               <input type="radio" name="question7" value="3"/>Yes
              </div>
         </form>
+
+
 
         <script type="text/javascript">
             $(document).ready(function(){

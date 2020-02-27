@@ -23,7 +23,7 @@
 
         .wrap{
             padding:5px 0;
-            margin:10px 0;
+            margin:20px 0;
         }
 
         .tip{
@@ -49,12 +49,12 @@
 </head>
 <body>
 
-        <div class="navbar">
+        <div class="navbar" align="center">
             <a href="{{ url_for('movie_degree3') }}">Go back</a>
             <a id="finish" >Finish</a>
         </div>
 
-        <form id="question1" class="question">
+        <form id="question1" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often will you watch a movie you think in the future</label>
               <input type="radio" name="question1" value="1"/>several days
@@ -63,7 +63,9 @@
             </div>
         </form>
 
-        <form id="question2" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question2" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often will you visit a movie recommendation website you think in the future</label>
               <input type="radio" name="question2" value="1"/>several days
@@ -71,8 +73,10 @@
               <input type="radio" name="question2" value="3"/>once a month
             </div>
         </form>
+
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
          
-        <form id="question3" class="question">
+        <form id="question3" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you know Recommendation System more after the User Study</label>
               <input type="radio" name="question3" value="1"/>No
@@ -81,7 +85,9 @@
             </div>
         </form>
 
-        <form id="question4" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question4" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you know Explainable Recommendation System more after the User Study</label>
               <input type="radio" name="question4" value="1"/>No
@@ -90,7 +96,9 @@
             </div>
         </form>
 
-        <form id="question5" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question5" class="question" align="right">
             <div class="wrap">
               <label class="tip">How often will you use a Recommend System you think in the future</label>
               <input type="radio" name="question5" value="1"/>several days
@@ -99,7 +107,9 @@
             </div>
         </form>
 
-         <form id="question6" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+         <form id="question6" class="question" align="right">
             <div class="wrap">
               <label class="tip">How would you describe your overall experience with Recommend System after the User Study</label>
               <input type="radio" name="question6" value="1"/>not good
@@ -108,7 +118,9 @@
             </div>
         </form>
 
-        <form id="question7" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question7" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you think that our recommendation system recommended the right movies to you?</label>
               <input type="radio" name="question7" value="1"/>No
@@ -117,7 +129,9 @@
              </div>
         </form>
 
-        <form id="question8" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question8" class="question" align="right">
             <div class="wrap">
               <label class="tip">Is explanation adaptation (from round1 to round2 to round3) helpful to improve the explainability of this Recommend System</label>
               <input type="radio" name="question8" value="1"/>No
@@ -126,7 +140,9 @@
              </div>
         </form>
 
-        <form id="question9" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question9" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you think the recommended movies are more and more in line with what you expect</label>
               <input type="radio" name="question9" value="1"/>No
@@ -135,7 +151,9 @@
              </div>
         </form>
 
-        <form id="question10" class="question">
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question10" class="question" align="right">
             <div class="wrap">
               <label class="tip">Do you think the recommended movies are more and more in line with what you really need (from round1 to round2 to round3)</label>
               <input type="radio" name="question10" value="1"/>No
@@ -143,6 +161,9 @@
               <input type="radio" name="question10" value="3"/>Yes
              </div>
         </form>
+
+        {#        question: score for round1, round2, round3#}
+
 
         <script type="text/javascript">
             $(document).ready(function(){

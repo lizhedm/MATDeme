@@ -74,7 +74,6 @@ class PGATRecSys(object):
         print('user building done...')
 
     def get_recommendations(self,rs_proportion):
-
         iids = self.get_top_n_popular_items(200).iid
         iids = [iid for iid in iids if iid not in self.recommended]
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
@@ -108,6 +107,7 @@ class PGATRecSys(object):
         uicc_rec_exp = [exp[idx] for idx in uicc_rec_index]
 
         final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
+
         self.recommended += final_rec_iids
 
         item_df = self.data.items[0]

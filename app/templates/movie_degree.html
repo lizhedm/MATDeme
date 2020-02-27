@@ -24,6 +24,7 @@
             margin-right: auto;
             margin-bottom: 5px;
             width: 18%;
+            height: 40%;
             font-weight:bold;
         }
 
@@ -72,10 +73,11 @@
             margin: 5px;
         }
         p{
-            padding: 20px;
-            color: forestgreen;
-            font: 20px caption;
+            padding: 5px;
+            font: 16px "Adobe Fan Heiti Std";;
             margin-bottom: 5px;
+            margin-left: 10%;
+            margin-right: 10%;
         }
         .text{
             font: 12px caption;
@@ -115,13 +117,13 @@
     </style>
 </head>
 <body>
-    <div class="navbar">
+    <div class="navbar" align="center">
         <a href="{{ url_for('movie_preview') }}">Go back</a>
         <a href="{{ url_for('movie_degree2') }}" >Next</a>
     </div>
 
     <div>
-        <p>Make the image selected if you would like to watch this movie, and rate our recommendation reasons(1~5 points)</p>
+        <h2 align="center">Make the image selected if you would like to watch this movie, and rate our recommendation reasons(1~5 points)</h2>
     </div>
 
     <div class="container" id = "container">
@@ -190,7 +192,7 @@
                     }
                 });
 {#                alert('movie_name2221:'+movie_name1);#}
-                explanation_text = 'You are recommended with \"' + movie_name1 + '\" because user ' + uid2 + ' is similar with you' + ' and user ' + uid2 + ' likes this movie';
+                explanation_text = 'You are recommended with \"' + movie_name1 + '\" because user ' + '<a href="#" id="user_' + uid2 + '" onclick="ShowUserInfo();return false;"> ' + uid2 + '</a>' + ' is similar with you and user ' + uid2 + ' likes this movie';
 
             } else if(upper_text === 'IUI'){
 {#                item-based recommendation#}
@@ -328,6 +330,13 @@
                 });
             }
         });
+
+        $(document).on('click','a',function ShowUserInfo() {
+{#            example: user_1234#}
+            var user_id = this.id.substr(5);
+            alert(user_id);
+        });
+
     </script>
 
 </body>
