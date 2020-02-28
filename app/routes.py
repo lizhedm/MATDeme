@@ -75,6 +75,7 @@ print('task params: {}'.format(model_args))
 print('device_args params: {}'.format(device_args))
 
 recsys = PGATRecSys(num_recs=10, dataset_args=dataset_args, model_args=model_args, device_args=device_args)
+
 refresh_value = 0
 
 @app.template_global()
@@ -95,7 +96,8 @@ def get_movie_poster_withID(i):
 
     # apikey = 'e760129c'
     # apikey = 'e44e5305'
-    apikey = '192c6b0e'
+    apikey = 'c32748ad'
+    # apikey = '192c6b0e'
     movies = pd.read_csv('app/ml-1m/movies.dat', sep='::', engine='python')
     movie_name = get_movie_name_withID(i)
     movie_title = movie_name[0:-7]
@@ -118,9 +120,11 @@ def get_movie_poster_withID(i):
             return poster
 
     except:
+
         response_value = response_text['Response']
+        # print('response_value:'+response_value)
         # {"Response": "False", "Error": "Movie not found!"}
-        if response_value == 'False':
+        if 'False' == response_value:
             r2 = requests.get(movie_url_no_year)
             movie_info_dic2 = json.loads(r2.text)
             try:
@@ -256,7 +260,7 @@ def save_question_result2_tosqlite(user_id,question_result2_list):
     cursor = connection.cursor()
     print("Opened database successfully")
 
-    cursor.execute('create table if not exists QUESTION_RESULT2 (user_id,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10)')
+    cursor.execute('create table if not exists QUESTION_RESULT2 (user_id,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13)')
     params = (user_id,
               question_result2_list[0],
               question_result2_list[1],
@@ -267,9 +271,12 @@ def save_question_result2_tosqlite(user_id,question_result2_list):
               question_result2_list[6],
               question_result2_list[7],
               question_result2_list[8],
-              question_result2_list[9])
+              question_result2_list[9],
+              question_result2_list[10],
+              question_result2_list[11],
+              question_result2_list[12])
 
-    cursor.execute("INSERT INTO QUESTION_RESULT2 VALUES (?,?,?,?,?,?,?,?,?,?,?)", params)
+    cursor.execute("INSERT INTO QUESTION_RESULT2 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", params)
     connection.commit()
     print("Records created successfully")
 
@@ -333,8 +340,8 @@ def question_result_transfer():
 @app.route('/movie_preview')
 def movie_preview():
 
-    i = range(300)
-    movie_ids = generateIDs(300)
+    i = range(500)
+    movie_ids = generateIDs(500)
     step = 6
     group_movieIDs = [movie_ids[i:i + step] for i in range(0, len(movie_ids), step)]
     click_count = refresh_value
@@ -422,6 +429,27 @@ def score_movie_transfer():
         return 'success'
     else:
         return 'fail'
+
+@app.route('/user_info_transfer',methods=['GET','POST'])
+def user_info_transfer():
+    if request.method == 'POST':
+
+        user_id = int(request.values['user_id'])
+        user_gender = recsys.data.users[0]['gender'][user_id]
+        user_age = recsys.data.users[0]['age'][user_id]
+        user_occ = recsys.data.users[0]['occupation'][user_id]
+
+        ratings_iids = recsys.data.ratings[0]['iid']
+        ratings_uids = recsys.data.ratings[0]['uid']
+        # get iids of movie user has seen
+        user_movie_iids = [iid for uid,iid in zip(ratings_uids,ratings_iids) if uid==user_id]
+        user_movie_names = [get_movie_name_withID(iid) for iid in user_movie_iids]
+
+        # import pdb
+        # pdb.set_trace()
+
+        user_info = {'user_id':str(user_id),'user_gender':user_gender,'user_age':user_age,'user_occ':user_occ,'user_movie_names':user_movie_names}
+        return user_info
 
 @app.route('/movie_degree2')
 def movie_degree2():

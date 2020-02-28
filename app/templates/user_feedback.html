@@ -27,10 +27,9 @@
         }
 
         .tip{
-            width:40%;
             padding-right:20px;
             float:left;
-            text-align: right;
+            text-align: left;
         }
         /* Style the navigation bar links */
         .navbar a {
@@ -162,12 +161,52 @@
              </div>
         </form>
 
-        {#        question: score for round1, round2, round3#}
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question11" class="question" align="right">
+            <div class="wrap">
+              <label class="tip">What's your score for recommendation style in round 1?</label>
+              <input type="radio" name="question11" value="1"/>1
+              <input type="radio" name="question11" value="2"/>2
+              <input type="radio" name="question11" value="3"/>3
+              <input type="radio" name="question11" value="4"/>4
+              <input type="radio" name="question11" value="5"/>5
+
+             </div>
+        </form>
+
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question12" class="question" align="right">
+            <div class="wrap">
+              <label class="tip">What's your score for recommendation style in round 2?</label>
+              <input type="radio" name="question12" value="1"/>1
+              <input type="radio" name="question12" value="2"/>2
+              <input type="radio" name="question12" value="3"/>3
+              <input type="radio" name="question12" value="4"/>4
+              <input type="radio" name="question12" value="5"/>5
+
+             </div>
+        </form>
+
+        <div style="margin: 30px 8px 20px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+        <form id="question13" class="question" align="right">
+            <div class="wrap">
+              <label class="tip">What's your score for recommendation style in round 3?</label>
+              <input type="radio" name="question13" value="1"/>1
+              <input type="radio" name="question13" value="2"/>2
+              <input type="radio" name="question13" value="3"/>3
+              <input type="radio" name="question13" value="4"/>4
+              <input type="radio" name="question13" value="5"/>5
+
+             </div>
+        </form>
 
 
         <script type="text/javascript">
             $(document).ready(function(){
-                var question_result_list = [0,0,0,0,0,0,0,0,0,0];
+                var question_result_list = [0,0,0,0,0,0,0,0,0,0,0,0,0];
                 $('.question').change(function () {
 
                     var question_name = this.id;

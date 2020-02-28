@@ -18,8 +18,12 @@
         }
 
         form{
-            margin:0 auto;
             font-weight:bold;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 5px;
+            width: 30%;
+            height: 40%;
         }
 
         .wrap{
@@ -60,6 +64,8 @@
         .text{
             font: 12px caption;
             margin-bottom: 5px;
+            word-break: break-all;
+            white-space: normal;
         }
 
         /* Style the navigation bar links */
@@ -101,11 +107,9 @@
     <div class="navbar" align="center">
         <a href="{{ url_for('user_background') }}">Go back</a>
         <a id="refresh">Refresh</a>
-{#        <a href="{{ url_for('movie_preview') }}">Refresh</a>#}
         <a href="{{ url_for('movie_degree') }}" >Next</a>
     </div>
 
-{#    {% with click_count = 3 %}#}
         <div><h1 id = "container_h1"></h1></div>
         <div class="container" id = "container">
 
@@ -118,28 +122,7 @@
                     </form>
                 {% endfor %}
 
-    {#            {% for i,movie_id in i_movie_id %}#}
-    {#                {% if i is divisibleby(6) %}#}
-    {#                    <div><label><br> <br>Block {{ (i / 6)|round|int }} <br></label></div>#}
-    {#                    <form>#}
-    {#                        <div class = 'image' id = {{ movie_id }}>#}
-    {#                            <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
-    {#                            <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
-    {#                        </div>#}
-    {#                {% else %}#}
-    {#                    <div class = 'image' id = {{ movie_id }}>#}
-    {#                        <a href="#"><img src = {{ get_movie_poster_withID(movie_id) }}></a>#}
-    {#                        <div class = 'text' id = 'movie_name'>{{ get_movie_name_withID(movie_id) }}</div>#}
-    {#                    </div>#}
-    {#                {% endif %}#}
-    {#                    </form>#}
-    {##}
-    {#            {% endfor %}#}
-
-
-
         </div>
-{#    {% endwith %}#}
 
     <script type="text/javascript">
         function select(element) {
@@ -148,13 +131,6 @@
           }
         }
         Array.from(document.getElementsByClassName('selectable')).forEach(select);
-{#        $(document).ready(function(){#}
-{#            sessionStorage.setItem('refresh_value',0);#}
-{#            var click_count = parseInt(sessionStorage.getItem('refresh_value'));#}
-{#            console.log('typeof(click_count)='+typeof(click_count))#}
-{#            console.log('click_count = ' + click_count);#}
-{#            $('#container_h1').innerText = click_count.toString();#}
-{#        });#}
 
         var id_list = [];
         $(".image").on("click",function () {
@@ -181,18 +157,6 @@
     {#               if(response === 'success'){ alert('Yay!'); } else{ alert('Error! :('); }#}
                 });
             }
-
-
-{#            from js send data to python #}
-{#            $.ajax({#}
-{#                url: "imgID_userinfo_post",#}
-{#                type: "POST",#}
-{#                dataType: "json",#}
-{#                success: function (data) {#}
-{#                    console.log(data)#}
-{#                    alert(data.id);#}
-{#                }#}
-{#                })#}
 
         });
 
