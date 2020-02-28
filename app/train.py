@@ -5,6 +5,7 @@ from torch_geometric.datasets import MovieLens
 from torch.optim import Adam
 import time
 import numpy as np
+import tqdm
 
 from utils import get_folder_path
 from pagat import PAGAT
@@ -22,7 +23,7 @@ parser.add_argument("--debug", default=0.01, help="")
 # Model params
 parser.add_argument("--heads", type=int, default=4, help="")
 parser.add_argument("--emb_dim", type=int, default=16, help="")
-parser.add_argument("--repr_dim", type=int, default=8, help="")
+parser.add_argument("--repr_dim", type=int, default=16, help="")
 parser.add_argument("--hidden_size", type=int, default=64, help="")
 
 # Train params
@@ -95,7 +96,9 @@ if __name__ == '__main__':
         data_loader = DataLoader(user_pos_neg_pair, shuffle=True, batch_size=train_args['batch_size'])
 
         model.train()
-        for user_pos_neg_pair_batch in data_loader:
+        epoch_losses = []
+        train_bar = tqdm.tqdm(data_loader)
+        for user_pos_neg_pair_batch in train_bar:
             u_nid, pos_i_nid, neg_i_nid = user_pos_neg_pair_batch.T
             occ_nid = np.concatenate((u_nid, pos_i_nid, neg_i_nid))
             path_index_batch = torch.from_numpy(data.path_np[0][:, np.isin(data.path_np[0][-1, :], occ_nid)]).to(train_args['device'])
@@ -109,6 +112,9 @@ if __name__ == '__main__':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+            epoch_losses.append(loss.cpu().item())
+            train_bar.set_description('Epoch {}: loss {}'.format(epoch, np.mean(epoch_losses)))
 
         model.eval()
         HR, NDCG, loss = metrics(model, dataset, train_args, rec_args)

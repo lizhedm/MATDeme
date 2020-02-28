@@ -22,7 +22,6 @@ class PAGAT(torch.nn.Module):
             heads * hidden_size,
             repr_dim,
             heads=heads,
-            concat=False,
             dropout=dropout,
         )
 
