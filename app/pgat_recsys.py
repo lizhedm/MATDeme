@@ -87,8 +87,8 @@ class PGATRecSys(object):
         # how to know what is the explanation type of rec_iids
 
 
-        exp = [self.get_explanation(iid) for iid in rec_iids]
-        exp, expl_types = [_[0] for _ in exp], [_[1] for _ in exp]
+        exp_tuple = [self.get_explanation(iid) for iid in rec_iids]
+        exp, expl_types = [_[0] for _ in exp_tuple], [_[1] for _ in exp_tuple]
 
         iui_rec_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][:rs_proportion['IUI']]
         iui_rec_iids = [rec_iids[idx] for idx in iui_rec_index]
@@ -106,15 +106,21 @@ class PGATRecSys(object):
         uicc_rec_iids = [rec_iids[idx] for idx in uicc_rec_index]
         uicc_rec_exp = [exp[idx] for idx in uicc_rec_index]
 
-        iui_rec_padded_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][rs_proportion['IUI']:]
-        iui_rec_padded_iids = [rec_iids[idx] for idx in iui_rec_padded_index]
-        iui_rec_padded_exp = [exp[idx] for idx in iui_rec_padded_index]
+        # iui_rec_padded_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][rs_proportion['IUI']:]
+        # iui_rec_padded_iids = [rec_iids[idx] for idx in iui_rec_padded_index]
+        # iui_rec_padded_exp = [exp[idx] for idx in iui_rec_padded_index]
 
         temp_final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
-        final_rec_iids = (temp_final_rec_iids + iui_rec_padded_iids)[:10]
+
+        padded_rec_index = [idx for idx, expl_type in enumerate(expl_types)]
+        padded_rec_iids = [iid for iid in (rec_iids - temp_final_rec_iids)]
+        padded_rec_exp = [exp[idx] for idx in padded_rec_index]
+
+
+        final_rec_iids = (temp_final_rec_iids + padded_rec_iids)[:10]
 
         temp_final_exp = iui_rec_exp + uiu_rec_exp + iudd_rec_exp + uicc_rec_exp
-        final_exp = (temp_final_exp + iui_rec_padded_exp)[:10]
+        final_exp = (temp_final_exp + padded_rec_exp)[:10]
 
         self.recommended += final_rec_iids
 
