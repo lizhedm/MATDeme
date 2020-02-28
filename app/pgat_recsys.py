@@ -21,9 +21,7 @@ class PGATRecSys(object):
 
         self.data = MovieLens(**dataset_args).data.to(device_args['device'])
 
-        self.node_emb = torch.nn.Embedding(self.data.num_nodes[0], model_args['emb_dim'], max_norm=1, norm_type=2.0)
-        self.model = PAGATNet(**model_args).to(device_args['device'])
-
+        self.model = PAGATNet(num_nodes=self.data.num_nodes[0], **model_args).to(device_args['device'])
         self.recommended = []
 
     def get_top_n_popular_items(self, n=10):
@@ -54,10 +52,10 @@ class PGATRecSys(object):
         self.base_iids = iids
         self.demographic_info = demographic_info
         # Build edges for new user
-        self.new_user_nid = self.node_emb.weight.shape[0]
+        self.new_user_nid = self.model.node_emb.weight.shape[0]
 
         new_user_gender_nid = self.data.e2nid[0]['gender'][demographic_info[0]]
-        new_user_occ_nid = self.data.e2nid[0]['occ'][demographic_info[1]]
+        new_user_occ_nid = self.data.e2nid[0]['occ'][int(demographic_info[1])]
         i_nids = [self.data.e2nid[0]['iid'][iid] for iid in iids]
         row = i_nids + [new_user_gender_nid, new_user_occ_nid]
         col = [self.new_user_nid for i in range(len(iids) + 2)]
@@ -68,9 +66,9 @@ class PGATRecSys(object):
         self.new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
 
         # Get new user embedding by applying message passing
-        self.new_user_emb = torch.nn.Embedding(1, self.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
-        new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
-        self.propagated_new_user_emb= self.model.forward(new_node_emb, self.new_path)[0][-1, :]
+        self.new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
+        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb), dim=0)
+        self.propagated_new_user_emb= self.model(new_node_emb, self.new_path)[0][-1, :]
         print('user building done...')
 
     def get_recommendations(self,rs_proportion):
@@ -78,7 +76,7 @@ class PGATRecSys(object):
         iids = [iid for iid in iids if iid not in self.recommended]
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
         rec_nids = [self.data.e2nid[0]['iid'][iid] for iid in rec_iids]
-        rec_item_emb = self.node_emb.weight[rec_nids]
+        rec_item_emb = self.model.node_emb.weight[rec_nids]
         est_feedback = torch.sum(self.propagated_new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
         rec_iid_idx = [i for i in np.argsort(est_feedback)]
         # [:self.num_recs]
@@ -132,7 +130,7 @@ class PGATRecSys(object):
         )
         new_path_np = utils.path.join(exist_edge_index, expl_edge_index)
         new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
-        new_node_emb = torch.cat((self.node_emb.weight, self.new_user_emb), dim=0)
+        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb), dim=0)
         att = self.model.forward(new_node_emb, new_path)[1]
         opt_path = new_path[:, torch.argmax(att)].numpy()
 
