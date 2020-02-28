@@ -23,7 +23,7 @@ parser.add_argument("--dataset", type=str, default='movielens', help="")
 parser.add_argument("--dataset_name", type=str, default='1m', help="")
 parser.add_argument("--num_core", type=int, default=10, help="")
 parser.add_argument("--step_length", type=int, default=2, help="")
-parser.add_argument("--train_ratio", type=float, default=False, help="")
+parser.add_argument("--train_ratio", type=float, default=None, help="")
 parser.add_argument("--debug", default=0.01, help="")
 
 # Model params
