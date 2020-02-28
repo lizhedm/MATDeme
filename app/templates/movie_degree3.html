@@ -91,6 +91,48 @@
             font-family: "Helvetica Neue Light", "Lucida Grande", "Calibri", "Arial", sans-serif;
             margin-bottom: 5px;
         }
+
+        .animated {
+          animation-duration: 1s;
+          animation-fill-mode: both;
+        }
+
+        @keyframes bounceInDown {
+          from,
+          60%,
+          75%,
+          90%,
+          to {
+              animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+          }
+
+          0% {
+              opacity: 0;
+              transform: translate3d(0, -3000px, 0);
+          }
+
+          60% {
+              opacity: 1;
+              transform: translate3d(0, 25px, 0);
+          }
+
+          75% {
+              transform: translate3d(0, -10px, 0);
+          }
+
+          90% {
+              transform: translate3d(0, 5px, 0);
+          }
+
+          to {
+              transform: none;
+          }
+        }
+
+        .bounceInDown {
+          animation-name: bounceInDown;
+        }
+
         /* Style the navigation bar links */
         .navbar a {
           color: forestgreen;
@@ -193,8 +235,7 @@
 
                     }
                 });
-{#                alert('movie_name2221:'+movie_name1);#}
-                explanation_text = 'You are recommended with \"' + movie_name1 + '\" because user ' + uid2 + ' is similar with you' + ' and user ' + uid2 + ' likes this movie';
+                explanation_text = 'You are recommended with \"' + movie_name1 + '\" because user ' + '<a href="#" class="user_info_click" id="user_' + uid2 + '" onclick="ShowUserInfo();return false;"> ' + uid2 + '</a>' + ' is similar with you and user ' + uid2 + ' likes this movie';
 
             } else if(upper_text === 'IUI'){
 {#                item-based recommendation#}
@@ -329,6 +370,91 @@
                     if(response){}
                 });
             }
+        });
+
+        var user_id_click_flag = 0;
+        $(document).on('click','a.user_info_click',function ShowUserInfo() {
+{#            example: user_1234#}
+            var user_id = this.id.substr(5);
+            var user_info = '';
+
+            var user_info_div = document.createElement("div");
+            user_info_div.style.backgroundColor = " forestgreen";
+            user_info_div.style.color = " #fff";
+            user_info_div.style.opacity = "0.9";
+            user_info_div.style.border = "3px solid green";
+            user_info_div.style.position = " absolute";
+            user_info_div.style.zIndex = 9999999;
+
+            user_info_div.style.lineHeight = "auto";
+            user_info_div.style.borderRadius = " 4px";
+{#            user_info_div.style.fontSize = " 20px";#}
+
+            user_info_div.style.textAlign = "center";
+{#            padding does not work#}
+            user_info_div.style.padding = " auto";
+
+            user_info_div.className = "animated  bounceInDown";
+            user_info_div.id = "alert";
+
+            user_info_div.style.margin = "10 auto";
+
+            var key_value_occ = {
+                        '0':'Other',
+                        '1':'academic/educator',
+                        '2':'artist',
+                        '3':'clerical/admin',
+                        '4':'college/grad student',
+                        '5':'customer service',
+                        '6':'doctor/health care',
+                        '7':'executive/managerial',
+                        '8':'farmer',
+                        '9':'homemaker',
+                        '10':'K-12 student',
+                        '11':'lawyer',
+                        '12':'programmer',
+                        '13':'retired',
+                        '14':'sales/marketing',
+                        '15':'scientist',
+                        '16':'self-employed',
+                        '17':'technician/engineer',
+                        '18':'tradesman/craftsman',
+                        '19':'unemployed',
+                        '20':'writer'
+                    }
+            var data = {'user_id':user_id};
+            $.post('{{ url_for('user_info_transfer') }}',data,function (response){
+                    if(response){
+                        var user_gender = response['user_gender'];
+                        var user_age = response['user_age'];
+                        var user_occ = response['user_occ'];
+                        var user_movie_names = response['user_movie_names'];
+                        user_info = 'Gender: ' + user_gender
+                                   + '  Age: ' + user_age
+                             + '  Occupation:' + key_value_occ[user_occ]
+                        + '<br>Favorite Movies:' + user_movie_names;
+                    }
+                });
+
+            user_info_div.innerHTML = user_info;
+{#            make user_info_div in the center#}
+            user_info_div.style.top = " 40%";
+            user_info_div.style.left = " 30%";
+            user_info_div.style.width = " 40%";
+            user_info_div.style.height = "20%";
+            var user_info_div_width = window.getComputedStyle(user_info_div, null).width;
+            user_info_div.style.marginLeft = -parseInt(user_info_div_width) / 2 + "px";
+{#            user_info_div.style.top = centerY - user_info_div.style.height /2;#}
+{#            user_info_div.style.left = centerX - user_info_div.style.width /2;#}
+
+            if(user_id_click_flag){
+                this.removeChild(this.childNodes[1]);
+                user_id_click_flag = 0;
+            } else {
+                this.appendChild(user_info_div);
+                user_id_click_flag = 1;
+            }
+
         });
     </script>
 

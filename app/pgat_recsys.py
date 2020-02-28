@@ -106,15 +106,20 @@ class PGATRecSys(object):
         uicc_rec_iids = [rec_iids[idx] for idx in uicc_rec_index]
         uicc_rec_exp = [exp[idx] for idx in uicc_rec_index]
 
-        final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
+        iui_rec_padded_index = [idx for idx, expl_type in enumerate(expl_types) if expl_type == 'IUI'][rs_proportion['IUI']:]
+        iui_rec_padded_iids = [rec_iids[idx] for idx in iui_rec_padded_index]
+        iui_rec_padded_exp = [exp[idx] for idx in iui_rec_padded_index]
+
+        temp_final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
+        final_rec_iids = (temp_final_rec_iids + iui_rec_padded_iids)[:10]
+
+        temp_final_exp = iui_rec_exp + uiu_rec_exp + iudd_rec_exp + uicc_rec_exp
+        final_exp = (temp_final_exp + iui_rec_padded_exp)[:10]
 
         self.recommended += final_rec_iids
 
         item_df = self.data.items[0]
         rec_item_df = item_df[item_df.iid.isin(final_rec_iids)]
-        final_exp = iui_rec_exp + uiu_rec_exp + iudd_rec_exp + uicc_rec_exp
-        # import pdb
-        # pdb.set_trace()
 
         return rec_item_df, final_exp
 
