@@ -22,6 +22,7 @@ class PGATRecSys(object):
         model_path = os.path.join(model_path, 'weights{}.pkl'.format(self.dataset.build_suffix()))
         del model_args['model_path']
         self.model = PAGATNet(num_nodes=self.data.num_nodes[0], **model_args).to(device_args['device'])
+        self.model.eval()
         try:
             self.model.load_state_dict(torch.load(model_path))
             print("Model from {} successfully loaded!".format(model_path))
@@ -71,8 +72,8 @@ class PGATRecSys(object):
         self.new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
 
         # Get new user embedding by applying message passing
-        self.new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
-        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb), dim=0)
+        self.new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1], max_norm=1, norm_type=2.0)
+        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb.weight), dim=0)
         self.propagated_new_user_emb = self.model(new_node_emb, self.new_path)[0][-1, :]
         print('user building done...')
 
@@ -82,7 +83,11 @@ class PGATRecSys(object):
         iids = [iid for iid in iids if iid not in self.recommended]
         rec_iids = [iid for iid in iids if iid not in self.base_iids]
         rec_nids = [self.data.e2nid[0]['iid'][iid] for iid in rec_iids]
-        rec_item_emb = self.model.node_emb.weight[rec_nids]
+
+        mask = np.isin(self.data.path_np[0][-1, :], rec_nids)
+        full_path_index = torch.from_numpy(self.data.path_np[0][:, mask]).to(self.device_args['device'])
+        propagated_node_emb = self.model(self.model.node_emb.weight, full_path_index)[0]
+        rec_item_emb = propagated_node_emb[rec_nids, :]
         est_feedback = torch.sum(self.propagated_new_user_emb * rec_item_emb, dim=1).reshape(-1).cpu().detach().numpy()
         rec_iid_idx = [i for i in np.argsort(est_feedback)]
         # [:self.num_recs]
@@ -137,16 +142,10 @@ class PGATRecSys(object):
         row = [movie_nid, self.new_user_nid]
         col = [self.new_user_nid, movie_nid]
         expl_edge_index = torch.from_numpy(np.array([row, col])).long().to(self.device_args['device'])
-        exist_edge_index = torch.cat(
-            (self.data.edge_index,
-             self.new_edge_index,
-             torch.flip(self.new_edge_index, dims=[0])
-             ),
-            dim=1
-        )
+        exist_edge_index = torch.cat((self.data.edge_index, self.new_edge_index), dim=1)
         new_path_np = utils.path.join(exist_edge_index, expl_edge_index)
         new_path = torch.from_numpy(new_path_np).long().to(self.device_args['device'])
-        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb), dim=0)
+        new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb.weight), dim=0)
         att = self.model.forward(new_node_emb, new_path)[1]
         opt_path = new_path[:, torch.argmax(att)].numpy()
 

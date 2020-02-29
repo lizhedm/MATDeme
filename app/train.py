@@ -9,7 +9,7 @@ import numpy as np
 import tqdm
 
 from utils import get_folder_path
-from pagat import PAGAT
+from pagat import PAGATNet
 from eval_rec_sys import metrics
 parser = argparse.ArgumentParser()
 
@@ -22,7 +22,9 @@ parser.add_argument("--train_ratio", type=float, default=0.8, help="")
 parser.add_argument("--debug", default=0.01, help="")
 
 # Model params
+# Model params
 parser.add_argument("--heads", type=int, default=4, help="")
+parser.add_argument("--dropout", type=float, default=0.6, help="")
 parser.add_argument("--emb_dim", type=int, default=16, help="")
 parser.add_argument("--repr_dim", type=int, default=16, help="")
 parser.add_argument("--hidden_size", type=int, default=64, help="")
@@ -61,7 +63,7 @@ dataset_args = {
 }
 model_args = {
     'heads': args.heads, 'hidden_size': args.hidden_size, 'emb_dim': args.emb_dim,
-    'repr_dim': args.repr_dim
+    'repr_dim': args.repr_dim, 'dropout': args.dropout
 }
 train_args = {
     'debug': args.debug,
@@ -81,7 +83,7 @@ print('rec params: {}'.format(rec_args))
 if __name__ == '__main__':
     dataset = MovieLens(**dataset_args)
     dataset.data = dataset.data.to(train_args['device'])
-    model = PAGAT(num_nodes=dataset.data.num_nodes[0], **model_args).to(train_args['device'])
+    model = PAGATNet(num_nodes=dataset.data.num_nodes[0], **model_args).to(train_args['device'])
     optimizer = Adam(model.parameters(), lr=train_args['lr'], weight_decay=train_args['weight_decay'])
     if torch.cuda.is_available():
         torch.cuda.synchronize()

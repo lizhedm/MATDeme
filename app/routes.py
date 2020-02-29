@@ -31,6 +31,7 @@ parser.add_argument("--heads", type=int, default=4, help="")
 parser.add_argument("--dropout", type=float, default=0.6, help="")
 parser.add_argument("--emb_dim", type=int, default=16, help="")
 parser.add_argument("--repr_dim", type=int, default=16, help="")
+parser.add_argument("--hidden_size", type=int, default=64, help="")
 
 # Device params
 parser.add_argument("--device", type=str, default='cpu', help="")
@@ -68,7 +69,7 @@ dataset_args = {
 model_args = {
     'heads': args.heads, 'emb_dim': args.emb_dim,
     'repr_dim': args.repr_dim, 'dropout': args.dropout,
-    'model_path': weights_folder
+    'hidden_size': args.hidden_size, 'model_path': weights_folder
 }
 device_args = {'debug': args.debug, 'device': device, 'gpu_idx': args.gpu_idx}
 print('dataset params: {}'.format(dataset_args))
