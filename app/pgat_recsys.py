@@ -22,7 +22,6 @@ class PGATRecSys(object):
         model_path = os.path.join(model_path, 'weights{}.pkl'.format(self.dataset.build_suffix()))
         del model_args['model_path']
         self.model = PAGATNet(num_nodes=self.data.num_nodes[0], **model_args).to(device_args['device'])
-        torch.save(self.model.state_dict(), model_path)
         try:
             self.model.load_state_dict(torch.load(model_path))
             print("Model from {} successfully loaded!".format(model_path))
