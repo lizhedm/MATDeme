@@ -142,6 +142,7 @@ def get_movie_poster_withID(i):
 @app.template_global()
 def run_adaptation_model(user_id,proportion,round_number):
     # get type and score data from sqlite3 database
+
     explanation_type_and_score_list = select_explanation_type_and_score(user_id,round_number)
 
     # calculate average score
