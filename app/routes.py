@@ -69,7 +69,7 @@ dataset_args = {
 model_args = {
     'heads': args.heads, 'emb_dim': args.emb_dim,
     'repr_dim': args.repr_dim, 'dropout': args.dropout,
-    'hidden_size': args.hidden_size
+    'hidden_size': args.hidden_size, 'model_path': weights_folder
 }
 device_args = {'debug': args.debug, 'device': device, 'gpu_idx': args.gpu_idx}
 print('dataset params: {}'.format(dataset_args))

@@ -1,16 +1,12 @@
-__model__ = 'PGAT'
+__model__ = 'PAGAT'
 
 import numpy as np
-import pandas as pd
 import torch
-import os.path as osp
-import operator
-
-from torch_geometric.datasets import MovieLens
-
-from .pgat import PAGATNet
 from torch_geometric.datasets import MovieLens
 from torch_geometric import utils
+import os
+
+from .pagat import PAGATNet
 from .utils import get_folder_path
 
 
@@ -19,9 +15,18 @@ class PGATRecSys(object):
         self.num_recs = num_recs
         self.device_args = device_args
 
-        self.data = MovieLens(**dataset_args).data.to(device_args['device'])
+        self.dataset = MovieLens(**dataset_args)
+        self.data = self.dataset.data.to(device_args['device'])
 
+        model_path = model_args['model_path']
+        model_path = os.path.join(model_path, 'weights{}.pkl'.format(self.dataset.build_suffix()))
+        del model_args['model_path']
         self.model = PAGATNet(num_nodes=self.data.num_nodes[0], **model_args).to(device_args['device'])
+        try:
+            self.model.load_state_dict(torch.load(model_path))
+            print("Model from {} successfully loaded!".format(model_path))
+        except:
+            print("No weights found in {}! Try use random initialized model.".format(model_path))
         self.recommended = []
 
     def get_top_n_popular_items(self, n=10):
