@@ -60,7 +60,7 @@ class PGATRecSys(object):
         self.new_user_nid = self.model.node_emb.weight.shape[0]
 
         new_user_gender_nid = self.data.e2nid[0]['gender'][demographic_info[0]]
-        new_user_occ_nid = self.data.e2nid[0]['occ'][int(demographic_info[1])]
+        new_user_occ_nid = self.data.e2nid[0]['occ'][demographic_info[1]]
         i_nids = [self.data.e2nid[0]['iid'][iid] for iid in iids]
         row = i_nids + [new_user_gender_nid, new_user_occ_nid]
         col = [self.new_user_nid for i in range(len(iids) + 2)]
@@ -73,7 +73,7 @@ class PGATRecSys(object):
         # Get new user embedding by applying message passing
         self.new_user_emb = torch.nn.Embedding(1, self.model.node_emb.weight.shape[1], max_norm=1, norm_type=2.0).weight
         new_node_emb = torch.cat((self.model.node_emb.weight, self.new_user_emb), dim=0)
-        self.propagated_new_user_emb= self.model(new_node_emb, self.new_path)[0][-1, :]
+        self.propagated_new_user_emb = self.model(new_node_emb, self.new_path)[0][-1, :]
         print('user building done...')
 
     def get_recommendations(self,rs_proportion):
@@ -117,9 +117,8 @@ class PGATRecSys(object):
         temp_final_rec_iids = iui_rec_iids + uiu_rec_iids + iudd_rec_iids + uicc_rec_iids
 
         padded_rec_index = [idx for idx, expl_type in enumerate(expl_types)]
-        padded_rec_iids = [iid for iid in (rec_iids - temp_final_rec_iids)]
+        padded_rec_iids = [iid for iid in rec_iids if iid not in temp_final_rec_iids]
         padded_rec_exp = [exp[idx] for idx in padded_rec_index]
-
 
         final_rec_iids = (temp_final_rec_iids + padded_rec_iids)[:10]
 

@@ -220,7 +220,7 @@
                 age = $("#age").children("option:selected").val();
 {#                alert('user_id:'+user_id+'gender:'+gender+'occupation:'+occupation+'age:'+age);#}
                 if(user_id && gender && occupation && age){
-                    location.href = "{{ url_for('user_background') }}";
+                    location.href = "{{ url_for('movie_preview') }}";
                 } else {
                     alert("Please input all the information");
                 }

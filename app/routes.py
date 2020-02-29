@@ -342,7 +342,6 @@ def question_result_transfer():
 @app.route('/movie_preview')
 def movie_preview():
 
-    i = range(500)
     movie_ids = generateIDs(500)
     step = 6
     group_movieIDs = [movie_ids[i:i + step] for i in range(0, len(movie_ids), step)]
