@@ -30,12 +30,12 @@ parser.add_argument("--repr_dim", type=int, default=16, help="")
 parser.add_argument("--hidden_size", type=int, default=64, help="")
 
 # Train params
-parser.add_argument("--device", type=str, default='cpu', help="")
+parser.add_argument("--device", type=str, default='cuda', help="")
 parser.add_argument("--gpu_idx", type=str, default='0', help="")
 parser.add_argument("--epochs", type=int, default=100, help="")
 parser.add_argument("--opt", type=str, default='adam', help="")
 parser.add_argument("--loss", type=str, default='mse', help="")
-parser.add_argument("--batch_size", type=int, default=16, help="")
+parser.add_argument("--batch_size", type=int, default=81920, help="")
 parser.add_argument("--lr", type=float, default=1e-4, help="")
 parser.add_argument("--weight_decay", type=float, default=0, help="")
 parser.add_argument("--early_stopping", type=int, default=40, help="")
@@ -105,22 +105,22 @@ if __name__ == '__main__':
             u_nid, pos_i_nid, neg_i_nid = user_pos_neg_pair_batch.T
             occ_nid = np.concatenate((u_nid, pos_i_nid, neg_i_nid))
             path_index_batch = torch.from_numpy(data.path_np[0][:, np.isin(data.path_np[0][-1, :], occ_nid)]).to(train_args['device'])
-            propagated_node_emb = model(path_index_batch)
+            propagated_node_emb = model(model.node_emb.weight, path_index_batch)[0]
 
             u_nid, pos_i_nid, neg_i_nid = u_nid.to(device), pos_i_nid.to(device), neg_i_nid.to(device)
             u_node_emb, pos_i_node_emb, neg_i_node_emb = propagated_node_emb[u_nid], propagated_node_emb[pos_i_nid], propagated_node_emb[neg_i_nid]
             pred_pos = (u_node_emb * pos_i_node_emb).sum(dim=1)
             pred_neg = (u_node_emb * neg_i_node_emb).sum(dim=1)
-            loss = - (pred_pos - pred_neg).sigmoid().log().sum()
-            optimizer.zero_grad()
+            loss = - (pred_pos - pred_neg).sigmoid().log().mean()
             loss.backward()
             optimizer.step()
+            optimizer.zero_grad()
 
             epoch_losses.append(loss.cpu().item())
             train_bar.set_description('Epoch {}: loss {}'.format(epoch, np.mean(epoch_losses)))
 
         model.eval()
-        HR, NDCG, loss = metrics(model, dataset, train_args, rec_args)
+        HR, NDCG, loss = metrics(epoch, model, dataset, train_args, rec_args)
 
         print('Epoch: {}, HR: {}, NDCG: {}, Loss: {}'.format(epoch, HR, NDCG, loss))
 
