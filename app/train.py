@@ -32,7 +32,7 @@ parser.add_argument("--hidden_size", type=int, default=64, help="")
 # Train params
 parser.add_argument("--device", type=str, default='cuda', help="")
 parser.add_argument("--gpu_idx", type=str, default='0', help="")
-parser.add_argument("--epochs", type=int, default=100, help="")
+parser.add_argument("--epochs", type=int, default=1000, help="")
 parser.add_argument("--opt", type=str, default='adam', help="")
 parser.add_argument("--loss", type=str, default='mse', help="")
 parser.add_argument("--batch_size", type=int, default=81920, help="")
